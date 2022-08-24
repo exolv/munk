@@ -1,0 +1,51 @@
+{
+  "icons": {
+    "16": "./assets/icons/icon16.png",
+    "48": "./assets/icons/icon48.png",
+    "128": "./assets/icons/icon128.png"
+  },
+  "manifest_version": 3,
+  "action": {
+    "default_icon": {
+      "16": "./assets/icons/icon16.png",
+      "48": "./assets/icons/icon48.png"
+    },
+    "default_popup": "./popup/popup.html"
+  },
+  "version": "1.0",
+  "name": "munk",
+  "description": "Extinde LinkedIn cu informații de pe Undelucram.",
+  "author": "xsuve",
+  "permissions": [],
+  "content_scripts": [
+    {
+      "matches": [
+        "https://www.linkedin.com/*"
+      ],
+      "js": [
+        "./assets/libs/react/react.production.min.js",
+        "./assets/libs/react/react-dom.production.min.js",
+        "./assets/libs/tailwindcss/tailwindcss.min.js",
+        "./components/rating/Rating.js",
+        "./content/content.js"
+      ],
+      "css": [
+        "./components/rating/Rating.css",
+        "./content/content.css"
+      ]
+    }
+  ],
+  "host_permissions": [
+    "https://*/*"
+  ],
+  "web_accessible_resources": [
+    {
+      "matches": [
+        "https://www.linkedin.com/*"
+      ],
+      "resources": [
+        "./content/content.css"
+      ]
+    }
+  ]
+}
