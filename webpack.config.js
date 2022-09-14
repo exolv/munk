@@ -2,6 +2,7 @@ const path = require('path');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 
 module.exports = {
+  target: 'web',
   entry: {
     content_scripts: './src/content-scripts/ContentScripts.js',
     popup: './src/popup/Popup.js',
@@ -58,11 +59,5 @@ module.exports = {
         }
       ]
     })
-  ],
-  devServer: {
-    static: {
-      directory: path.join(__dirname, 'build'),
-    },
-    port: 2405
-  }
+  ]
 };
