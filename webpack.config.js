@@ -4,9 +4,9 @@ const CopyWebpackPlugin = require('copy-webpack-plugin');
 module.exports = {
   target: 'web',
   entry: {
-    content_scripts: './src/content-scripts/ContentScripts.js',
-    popup: './src/popup/Popup.js',
-    options: './src/options/Options.js',
+    content_scripts: './src/content-scripts/content_scripts.js',
+    popup: './src/popup/popup.js',
+    options: './src/options/options.js',
     background: './src/background.js'
   },
   output: {

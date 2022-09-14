@@ -1,5 +1,3 @@
-'use strict';
-
 import '../../styles.css';
 
 const Rating = (props) => {

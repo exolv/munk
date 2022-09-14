@@ -1,9 +1,9 @@
 import { createRoot } from 'react-dom/client';
 
-// Components
 import Rating from '../components/rating/Rating';
 
-class Content {
+
+class ContentScripts {
   constructor() {
     //
   }
@@ -26,7 +26,7 @@ class Content {
 
             if (element.matches('.artdeco-entity-lockup__subtitle')) {
               element.classList.add('flex', 'justify-between', 'items-center');
-              this.renderRating(element, { rating: 4.56, displayLogo: false });
+              this.renderRating(element, { rating: 4.56, displayLogo: true });
             }
           }
         }
@@ -39,8 +39,8 @@ class Content {
 }
 
 try {
-  const content = new Content();
-  content.init();
+  const contentScripts = new ContentScripts();
+  contentScripts.init();
 } catch (error) {
-  console.warn('[munk] Content Error:', error);
+  console.warn('[munk] Content Scripts Error:', error);
 }

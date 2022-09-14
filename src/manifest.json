@@ -5,6 +5,7 @@
   "author": "xsuve",
   "manifest_version": 3,
   "permissions": [],
+  "options_page": "options.html",
   "content_scripts": [
     {
       "matches": [
