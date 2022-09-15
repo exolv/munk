@@ -1,6 +1,8 @@
+import React from 'react';
+
 import '../../styles.css';
 
-const Rating = (props) => {
+const Rating = (props: any) => {
   const { rating, displayLogo } = props.data;
 
   return (

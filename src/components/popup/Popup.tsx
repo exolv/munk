@@ -1,3 +1,5 @@
+import React from 'react';
+
 const Popup = () => {
   return (
     <h1>munk</h1>

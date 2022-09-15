@@ -1,3 +1,4 @@
+import React from 'react';
 import { createRoot } from 'react-dom/client';
 
 import Rating from '../components/rating/Rating';
@@ -8,7 +9,7 @@ class ContentScripts {
     //
   }
 
-  renderRating(element, data) {
+  renderRating(element: HTMLElement, data: RatingData) {
     const root = document.createElement('div');
     root.style.display = 'inline-block';
     element.insertAdjacentElement('beforeend', root);
@@ -26,7 +27,7 @@ class ContentScripts {
 
             if (element.matches('.artdeco-entity-lockup__subtitle')) {
               element.classList.add('flex', 'justify-between', 'items-center');
-              this.renderRating(element, { rating: 4.56, displayLogo: true });
+              this.renderRating(element, { rating: 4.56, displayLogo: false });
             }
           }
         }
