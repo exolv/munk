@@ -7,7 +7,8 @@ const Rating = (props: any) => {
 
   return (
     <div className='flex justify-between items-center'>
-      <div className='w-7 h-7'>
+      <div className='mx-3'>|</div>
+      <div className='w-6 h-6'>
         {
           rating >= 0 && rating < 1.67 ?
             <img src={chrome.runtime.getURL('assets/img/stars/empty.svg')} className='max-w-full' />
@@ -20,10 +21,10 @@ const Rating = (props: any) => {
           )
         }
       </div>
-      <span className='text-white ml-2'>{rating}</span>
+      <span className='text-white ml-2 text-[12px] pt-0.5'>{rating}</span>
       {
         displayLogo &&
-        <div className='w-6 h-6 ml-4'>
+        <div className='w-5 h-5 ml-4'>
           <img src={chrome.runtime.getURL('assets/img/undelucram-icon.svg')} className='max-w-full' />
         </div>
       }

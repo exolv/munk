@@ -15,14 +15,20 @@ Extensie pentru Google Chrome care afisează atât rating-ul companiilor cât ș
 ### Utilizare
 1. Descarcă / Clonează proiectul
 2. Deschide terminalul și rulează comanda `npm run build`
-2. Mergi în Chrome > Extensions
-3. Activează Developer Mode
-4. Apasă pe Load Unpacked Extension și alege folderul `/build` din proiect
+3. Mergi în Chrome > Extensions
+4. Activează Developer Mode
+5. Apasă pe Load Unpacked Extension și alege folderul `/build` din proiect
 
 ### Dezvoltare
+1. Deschide terminalul și rulează comanda `npm run start`
+2. De fiecare dată când se face o modificare pe codul sursă, proiectul este recompilat
+3. După fiecare recompilare este necesar un reload asupra extensiei din Chrome
+
+### Tech stack
 * React
-* JavaScript
+* TypeScript
 * TailwindCSS
+* Webpack
 
 ---
 
