@@ -33,7 +33,7 @@ const data = JSON.parse(`[
         "salary": 12500
       },
       {
-        "position": "Front End Software Developer",
+        "position": "Front End Developer",
         "years_of_experience": 2,
         "salary": 6000
       }
@@ -43,7 +43,7 @@ const data = JSON.parse(`[
     "company_name": "Luxoft",
     "salaries": [
       {
-        "position": "Frontend Developer",
+        "position": "Frontend Engineer",
         "years_of_experience": 2,
         "salary": 4500
       },
@@ -102,15 +102,35 @@ class ContentScripts {
                 );
                 if (companyNameMatch.length && companyNameMatch[0].score <= 0.001) {
                   // @ts-ignore
-                  const positionNameMatch = new Fuse(companyNameMatch[0].item.salaries, { keys: [['position']] }).search(
+                  const positionNameMatch = new Fuse(companyNameMatch[0].item.salaries, { keys: [['position']], includeScore: true, threshold: 0.45 }).search(
                     _positionName.textContent.trim().replace(/\n/g, '')
                   );
                   if (positionNameMatch.length) {
-                    const salaryPlace = element.querySelector('.job-card-list__footer-wrapper');
-                    if (salaryPlace) {
+                    const _salaryData: SalaryData = {
+                      range: {
+                        min: 0,
+                        max: undefined
+                      }
+                    };
+                    
+                    if (positionNameMatch.length > 1) {
                       // @ts-ignore
-                      this.renderSalary(salaryPlace, { salary: positionNameMatch[0].item.salary });
-                      break;
+                      const _salaries = positionNameMatch.map(o => o.item.salary).sort((a, b) => a - b);
+                      _salaryData.range = {
+                        min: _salaries[0],
+                        max: _salaries[_salaries.length - 1]
+                      };
+                    } else {
+                      // @ts-ignore
+                      _salaryData.range.min = positionNameMatch[0].item.salary;
+                    }
+                    
+                    if (_salaryData.range.min) {
+                      const salaryPlace = element.querySelector('.job-card-list__footer-wrapper');
+                      if (salaryPlace) {
+                        this.renderSalary(salaryPlace, _salaryData);
+                        break;
+                      }
                     }
                   }
                 }

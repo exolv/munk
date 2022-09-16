@@ -3,10 +3,10 @@ import React from 'react';
 import '../../styles.css';
 
 const Salary = (props: any) => {
-  const { salary } = props.data;
+  const { range } = props.data;
 
   return (
-    <div className='text-white text-[14px] pr-3'>{salary} lei</div>
+    <div className='text-white text-[14px] pr-3'>{range.min} lei {range.max && ` - ${range.max} lei`}</div>
   );
 }
 

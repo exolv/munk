@@ -1,5 +1,8 @@
 interface SalaryData {
-  salary: number;
+  range: {
+    min: number;
+    max: number | undefined;
+  };
 }
 
 export default SalaryData;
