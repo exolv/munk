@@ -1,5 +1,5 @@
 interface SalaryData {
-  salary: number
+  salary: number;
 }
 
 export default SalaryData;
