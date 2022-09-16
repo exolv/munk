@@ -1,16 +1,15 @@
 import React from 'react';
-import { createRoot } from 'react-dom/client';
-
-import Fuse from 'fuse.js';
+import { createRoot, Root } from 'react-dom/client';
 
 import Rating from '../components/rating/Rating';
 import RatingData from '../components/rating/RatingData';
 import Salary from '../components/salary/Salary';
 import SalaryData from '../components/salary/SalaryData';
 
-const data = JSON.parse(`[
+const data: any = JSON.parse(`[
   {
     "company_name": "Micro Focus",
+    "overall_rating": 3.78,
     "salaries": [
       {
         "position": "Software Development Intern",
@@ -40,15 +39,16 @@ const data = JSON.parse(`[
     ]
   },
   {
-    "company_name": "Luxoft",
+    "company_name": "Luxoft Romania",
+    "overall_rating": 3.87,
     "salaries": [
       {
-        "position": "Frontend Engineer",
+        "position": "Senior .NET C# Developer",
         "years_of_experience": 2,
         "salary": 4500
       },
       {
-        "position": "QA Automation Engineer",
+        "position": "Junior Frontend Engineer",
         "years_of_experience": 3,
         "salary": 5500
       }
@@ -62,23 +62,101 @@ class ContentScripts {
     //
   }
 
-  renderRating(element: Element, data: RatingData) {
-    const root = document.createElement('div');
+  renderRating(element: Element, data: RatingData): void {
+    const root: HTMLDivElement = document.createElement('div');
     root.classList.add('inline-block');
     element.insertAdjacentElement('beforeend', root);
-    const reactElement = createRoot(root);
+    const reactElement: Root = createRoot(root);
     reactElement.render(<Rating data={data} />);
   }
 
-  renderSalary(element: Element, data: SalaryData) {
-    const root = document.createElement('li');
+  renderSalary(element: Element, data: SalaryData): void {
+    const root: HTMLLIElement = document.createElement('li');
     root.classList.add('grow', 'text-right');
     element.insertAdjacentElement('beforeend', root);
-    const reactElement = createRoot(root);
+    const reactElement: Root = createRoot(root);
     reactElement.render(<Salary data={data} />);
   }
 
-  init() {    
+  _levenshtein(s1: string, s2: string) {
+    s1 = s1.toLowerCase();
+    s2 = s2.toLowerCase();
+
+    const costs: number[] = [];
+    for (let i = 0; i <= s1.length; i++) {
+      let lastValue: number = i;
+      for (let j = 0; j <= s2.length; j++) {
+        if (i == 0) {
+          costs[j] = j;
+        } else {
+          if (j > 0) {
+            let newValue: number = costs[j - 1];
+            if (s1.charAt(i - 1) != s2.charAt(j - 1)) {
+              newValue = Math.min(Math.min(newValue, lastValue), costs[j]) + 1;
+            }
+            costs[j - 1] = lastValue;
+            lastValue = newValue;
+          }
+        }
+      }
+      if (i > 0) {
+        costs[s2.length] = lastValue;
+      }
+    }
+    return costs[s2.length];
+  }
+
+  _similarity(s1: string, s2: string): number {
+    let longer: string = s1;
+    let shorter: string = s2;
+    if (s1.length < s2.length) {
+      longer = s2;
+      shorter = s1;
+    }
+    const longerLength: number = longer.length;
+    if (longerLength == 0) {
+      return 1.0;
+    }
+    return (longerLength - this._levenshtein(longer, shorter)) / longerLength;
+  }
+
+  matchCompanyName(companyName: string, data: any): object | undefined {
+    for (const company of data) {
+      if (this._similarity(company.company_name, companyName) >= 0.5) {
+        return company;
+      }
+    }
+
+    return undefined;
+  }
+
+  matchPositionNames(positionName: string, salaries: any[]): any[] {
+    const matches: any[] = [];
+    const positionNameWords: string[] = positionName.split(' ');
+    
+    let wordsMatchScore: number;
+    for (const salary of salaries) {
+      const salaryPositionNameWords: string[] = salary.position.split(' ');
+      wordsMatchScore = 0;
+
+      for (const sWord of salaryPositionNameWords) {
+        for (const pWord of positionNameWords) {
+          if (this._similarity(sWord, pWord) >= 0.75) {
+            wordsMatchScore += 1;
+          }
+        }
+      }
+
+      if (wordsMatchScore >= 1) {
+        salary.wordsMatchScore = wordsMatchScore;
+        matches.push(salary);
+      }
+    }
+
+    return matches;
+  }
+
+  init(): void {
     const jobsList = document.querySelector('.scaffold-layout__list-container');
     if (jobsList) {
       new MutationObserver((mutations: MutationRecord[]) => {
@@ -87,52 +165,52 @@ class ContentScripts {
             if (!(element instanceof HTMLElement)) continue;
 
             if (element.matches('.job-card-container')) {
-              // Rating
-              const ratingPlace = element.querySelector('.artdeco-entity-lockup__subtitle');
-              if (ratingPlace) {
-                this.renderRating(ratingPlace, { rating: 4.56, displayLogo: false });
-              }
+              const companyName: Element = element.querySelector('.job-card-container__company-name');
+              const positionName: Element = element.querySelector('.job-card-list__title');
+              if (companyName && positionName) {
+                const companyNameMatch: any = this.matchCompanyName(companyName.textContent.trim().replace(/\n/g, ''), data);
+                if (companyNameMatch) {
+                  const ratingData: RatingData = {
+                    rating: companyNameMatch.overall_rating,
+                    displayLogo: false
+                  };
+                  const ratingPlace: Element = element.querySelector('.artdeco-entity-lockup__subtitle');
+                  if (ratingPlace) {
+                    this.renderRating(ratingPlace, ratingData);
+                  }
 
-              // Salary
-              const _companyName = element.querySelector('.job-card-container__company-name');
-              const _positionName = element.querySelector('.job-card-list__title');
-              if (_companyName && _positionName) {
-                const companyNameMatch = new Fuse(data, { keys: ['company_name'], includeScore: true }).search(
-                  _companyName.textContent.trim().replace(/\n/g, '')
-                );
-                if (companyNameMatch.length && companyNameMatch[0].score <= 0.001) {
-                  // @ts-ignore
-                  const positionNameMatch = new Fuse(companyNameMatch[0].item.salaries, { keys: [['position']], includeScore: true, threshold: 0.45 }).search(
-                    _positionName.textContent.trim().replace(/\n/g, '')
-                  );
-                  if (positionNameMatch.length) {
-                    const _salaryData: SalaryData = {
+                  const positionsNameMatch: any[] = this.matchPositionNames(positionName.textContent.trim().replace(/\n/g, ''), companyNameMatch.salaries);
+                  console.log(positionsNameMatch);
+                  
+                  if (positionsNameMatch.length) {
+                    const salaryData: SalaryData = {
                       range: {
                         min: 0,
                         max: undefined
                       }
                     };
-                    
-                    if (positionNameMatch.length > 1) {
-                      // @ts-ignore
-                      const _salaries = positionNameMatch.map(o => o.item.salary).sort((a, b) => a - b);
-                      _salaryData.range = {
-                        min: _salaries[0],
-                        max: _salaries[_salaries.length - 1]
+
+                    if (positionsNameMatch.length > 1) {
+                      const salaries = positionsNameMatch.map(o => o.salary).sort((a, b) => a - b);
+                      salaryData.range = {
+                        min: salaries[0],
+                        max: salaries[salaries.length - 1]
                       };
                     } else {
-                      // @ts-ignore
-                      _salaryData.range.min = positionNameMatch[0].item.salary;
+                      salaryData.range.min = positionsNameMatch[0].salary;
                     }
-                    
-                    if (_salaryData.range.min) {
-                      const salaryPlace = element.querySelector('.job-card-list__footer-wrapper');
+
+                    if (salaryData.range.min) {
+                      const salaryPlace: Element = element.querySelector('.job-card-list__footer-wrapper');
                       if (salaryPlace) {
-                        this.renderSalary(salaryPlace, _salaryData);
+                        this.renderSalary(salaryPlace, salaryData);
+
                         break;
                       }
                     }
                   }
+
+                  break;
                 }
               }
             }
@@ -147,7 +225,7 @@ class ContentScripts {
 }
 
 try {
-  const contentScripts = new ContentScripts();
+  const contentScripts: ContentScripts = new ContentScripts();
   contentScripts.init();
 } catch (error) {
   console.warn('[munk] Content Scripts Error:', error);
