@@ -1,7 +1,11 @@
-import React from 'react';
+import React, { FC } from 'react';
 import { createRoot } from 'react-dom/client';
 
-import Popup from '../components/popup/Popup';
+const Popup: FC = () => {
+  return (
+    <h1>munk</h1>
+  );
+}
 
 const popupRoot = document.getElementById('popup-root');
 const popupElement = createRoot(popupRoot);

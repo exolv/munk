@@ -1,10 +1,8 @@
 import React from 'react';
 import { createRoot, Root } from 'react-dom/client';
 
-import Rating from '../components/rating/Rating';
-import RatingData from '../components/rating/RatingData';
-import Salary from '../components/salary/Salary';
-import SalaryData from '../components/salary/SalaryData';
+import { Rating, RatingData } from '../components/rating/Rating';
+import { Salary, SalaryData } from '../components/salary/Salary';
 
 const data: any = JSON.parse(`[
   {
@@ -67,7 +65,7 @@ class ContentScripts {
     root.classList.add('inline-block');
     element.insertAdjacentElement('beforeend', root);
     const reactElement: Root = createRoot(root);
-    reactElement.render(<Rating data={data} />);
+    reactElement.render(<Rating {...data} />);
   }
 
   renderSalary(element: Element, data: SalaryData): void {
@@ -75,7 +73,7 @@ class ContentScripts {
     root.classList.add('grow', 'text-right');
     element.insertAdjacentElement('beforeend', root);
     const reactElement: Root = createRoot(root);
-    reactElement.render(<Salary data={data} />);
+    reactElement.render(<Salary {...data} />);
   }
 
   _levenshtein(s1: string, s2: string) {
@@ -170,18 +168,15 @@ class ContentScripts {
               if (companyName && positionName) {
                 const companyNameMatch: any = this.matchCompanyName(companyName.textContent.trim().replace(/\n/g, ''), data);
                 if (companyNameMatch) {
-                  const ratingData: RatingData = {
-                    rating: companyNameMatch.overall_rating,
-                    displayLogo: false
-                  };
                   const ratingPlace: Element = element.querySelector('.artdeco-entity-lockup__subtitle');
                   if (ratingPlace) {
-                    this.renderRating(ratingPlace, ratingData);
+                    this.renderRating(ratingPlace, {
+                      rating: companyNameMatch.overall_rating,
+                      displayLogo: false
+                    });
                   }
 
                   const positionsNameMatch: any[] = this.matchPositionNames(positionName.textContent.trim().replace(/\n/g, ''), companyNameMatch.salaries);
-                  console.log(positionsNameMatch);
-                  
                   if (positionsNameMatch.length) {
                     const salaryData: SalaryData = {
                       range: {
