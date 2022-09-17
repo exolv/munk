@@ -8,29 +8,29 @@ const data: any = JSON.parse(`[
   {
     "company_name": "Micro Focus",
     "overall_rating": 3.78,
-    "salaries": [
+    "positions": [
       {
-        "position": "Software Development Intern",
+        "title": "Software Development Intern",
         "years_of_experience": 1,
         "salary": 3000
       },
       {
-        "position": "Renewal Sales Representative",
+        "title": "Renewal Sales Representative",
         "years_of_experience": 3,
         "salary": 5300
       },
       {
-        "position": "Senior Frontend Developer",
+        "title": "Senior Frontend Developer",
         "years_of_experience": 5,
         "salary": 7800
       },
       {
-        "position": "Senior Software Developer",
+        "title": "Senior Software Developer",
         "years_of_experience": 7,
         "salary": 12500
       },
       {
-        "position": "Front End Developer",
+        "title": "Front End Developer",
         "years_of_experience": 2,
         "salary": 6000
       }
@@ -39,14 +39,14 @@ const data: any = JSON.parse(`[
   {
     "company_name": "Luxoft Romania",
     "overall_rating": 3.87,
-    "salaries": [
+    "positions": [
       {
-        "position": "Senior .NET C# Developer",
+        "title": "Senior .NET C# Developer",
         "years_of_experience": 2,
         "salary": 4500
       },
       {
-        "position": "Junior Frontend Engineer",
+        "title": "Junior Front-End Engineer",
         "years_of_experience": 3,
         "salary": 5500
       }
@@ -76,7 +76,7 @@ class ContentScripts {
     reactElement.render(<Salary {...data} />);
   }
 
-  _levenshtein(s1: string, s2: string) {
+  levenshtein(s1: string, s2: string) {
     s1 = s1.toLowerCase();
     s2 = s2.toLowerCase();
 
@@ -104,7 +104,7 @@ class ContentScripts {
     return costs[s2.length];
   }
 
-  _similarity(s1: string, s2: string): number {
+  similarity(s1: string, s2: string): number {
     let longer: string = s1;
     let shorter: string = s2;
     if (s1.length < s2.length) {
@@ -115,12 +115,12 @@ class ContentScripts {
     if (longerLength == 0) {
       return 1.0;
     }
-    return (longerLength - this._levenshtein(longer, shorter)) / longerLength;
+    return (longerLength - this.levenshtein(longer, shorter)) / longerLength;
   }
 
   matchCompanyName(companyName: string, data: any): object | undefined {
     for (const company of data) {
-      if (this._similarity(company.company_name, companyName) >= 0.5) {
+      if (company.company_name.includes(companyName)) {
         return company;
       }
     }
@@ -128,26 +128,42 @@ class ContentScripts {
     return undefined;
   }
 
-  matchPositionNames(positionName: string, salaries: any[]): any[] {
-    const matches: any[] = [];
-    const positionNameWords: string[] = positionName.split(' ');
-    
-    let wordsMatchScore: number;
-    for (const salary of salaries) {
-      const salaryPositionNameWords: string[] = salary.position.split(' ');
-      wordsMatchScore = 0;
+  matchPositions(positionTitle: string, positions: any[], ngramLength: number = 2): any[] {
+    // positionTitle = React Developer
 
-      for (const sWord of salaryPositionNameWords) {
-        for (const pWord of positionNameWords) {
-          if (this._similarity(sWord, pWord) >= 0.75) {
-            wordsMatchScore += 1;
-          }
+    // React Engineer
+    // Senior .NET C# Developer -> Senior .NET, .NET C#, C# Developer
+
+    const matches: any[] = [];
+
+    positionTitle = positionTitle.replace('-', '').toLowerCase();
+    
+    for (const position of positions) {
+      const words: string[] = position.title.replace('-', '').toLowerCase().split(' ');
+
+      const ngrams: any[] = [];
+      for (let i = 0; i < words.length - 1; i++) {
+        ngrams.push({
+          word: words[i] + ' ' + words[i + 1]
+        });
+      }
+      
+      let score;
+      for (const ngram of ngrams) {
+        score = 0.5;
+
+        if (this.similarity(positionTitle, ngram.word) > 0.6) {
+          score += 0.2;
+        } else {
+          score -= 0.1;
         }
       }
 
-      if (wordsMatchScore >= 1) {
-        salary.wordsMatchScore = wordsMatchScore;
-        matches.push(salary);
+      if (score > 0.5) {
+        matches.push({
+          position: position,
+          score: score
+        });
       }
     }
 
@@ -163,10 +179,13 @@ class ContentScripts {
             if (!(element instanceof HTMLElement)) continue;
 
             if (element.matches('.job-card-container')) {
-              const companyName: Element = element.querySelector('.job-card-container__company-name');
-              const positionName: Element = element.querySelector('.job-card-list__title');
-              if (companyName && positionName) {
-                const companyNameMatch: any = this.matchCompanyName(companyName.textContent.trim().replace(/\n/g, ''), data);
+              let companyName: Element | string = element.querySelector('.job-card-container__company-name');
+              let positionTitle: Element | string = element.querySelector('.job-card-list__title');
+              if (companyName && positionTitle) {
+                companyName = companyName.textContent.trim().replace(/\n/g, '');
+                positionTitle = positionTitle.textContent.trim().replace(/\n/g, '');
+                
+                const companyNameMatch: any = this.matchCompanyName(companyName, data);
                 if (companyNameMatch) {
                   const ratingPlace: Element = element.querySelector('.artdeco-entity-lockup__subtitle');
                   if (ratingPlace) {
@@ -176,8 +195,8 @@ class ContentScripts {
                     });
                   }
 
-                  const positionsNameMatch: any[] = this.matchPositionNames(positionName.textContent.trim().replace(/\n/g, ''), companyNameMatch.salaries);
-                  if (positionsNameMatch.length) {
+                  const positionMatches: any = this.matchPositions(positionTitle, companyNameMatch.positions);
+                  if (positionMatches.length) {
                     const salaryData: SalaryData = {
                       range: {
                         min: 0,
@@ -185,14 +204,14 @@ class ContentScripts {
                       }
                     };
 
-                    if (positionsNameMatch.length > 1) {
-                      const salaries = positionsNameMatch.map(o => o.salary).sort((a, b) => a - b);
+                    if (positionMatches.length > 1) {
+                      const salaries: number[] = positionMatches.map((o: { position: { salary: any; }; }) => o.position.salary).sort((a: number, b: number) => a - b);
                       salaryData.range = {
                         min: salaries[0],
                         max: salaries[salaries.length - 1]
                       };
                     } else {
-                      salaryData.range.min = positionsNameMatch[0].salary;
+                      salaryData.range.min = positionMatches[0].position.salary;
                     }
 
                     if (salaryData.range.min) {
@@ -204,8 +223,6 @@ class ContentScripts {
                       }
                     }
                   }
-
-                  break;
                 }
               }
             }
