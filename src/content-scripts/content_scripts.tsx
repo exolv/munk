@@ -230,30 +230,48 @@ class ContentScripts {
   }
 
   matchPositions(positionTitle: string, positions: any[]): any[] {
-    const matches: any[] = [];
-
     const positionTitleWords: string[] = this.formatString(positionTitle).split(' ');
     let domainScore: any = {
       domainTitle: '',
-      score: 0
+      keywords: [],
+      scoreSum: 0
     };
     for (const positionTitleWord of positionTitleWords) {
       for (const domain of domains) {
-        if (this.similarity(positionTitleWord, domain.keyword) > 0.6) {
-          domainScore = {
-            domainTitle: domain.title,
-            score: domainScore.score + domain.score
-          };
+        if (this.similarity(positionTitleWord, domain.keyword) > 0.8) {
+          domainScore.domainTitle = domain.title;
+          domainScore.scoreSum += domain.score;
+          domainScore.keywords.push({
+            keyword: domain.keyword,
+            score: domain.score
+          });
         }
       }
     }
+    
+    const matches: any[] = [];
 
-    if (domainScore.score > 0) {
+    if (domainScore.scoreSum > 5) {
+      domainScore.keywords.push({
+        keyword: domainScore.domainTitle,
+        score: 0
+      });
+
       for (const position of positions) {
         const words: any[] = this.formatString(position.title).split(' ');
+
+        let wordScore: number;
         for (const word of words) {
-          if (this.similarity(domainScore.domainTitle, word) > 0.6) {
+          wordScore = 0;
+          for (const keyword of domainScore.keywords) {
+            if (this.similarity(keyword.keyword, word) > 0.8) {
+              wordScore += keyword.score;
+            }
+          }
+          
+          if (wordScore > 5) {
             matches.push(position);
+            break;
           }
         }
       }
