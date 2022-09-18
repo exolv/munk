@@ -4,7 +4,7 @@ import { createRoot, Root } from 'react-dom/client';
 import { Rating, RatingData } from '../components/rating/Rating';
 import { Salary, SalaryData } from '../components/salary/Salary';
 
-const data: any = JSON.parse(`[
+const data: any[] = JSON.parse(`[
   {
     "company_name": "Micro Focus",
     "overall_rating": 3.78,
@@ -30,7 +30,7 @@ const data: any = JSON.parse(`[
         "salary": 12500
       },
       {
-        "title": "Front End Developer",
+        "title": "Front-End Developer",
         "years_of_experience": 2,
         "salary": 6000
       }
@@ -41,19 +41,116 @@ const data: any = JSON.parse(`[
     "overall_rating": 3.87,
     "positions": [
       {
-        "title": "Senior .NET C# Developer",
+        "title": "QA Automation Engineer",
         "years_of_experience": 2,
-        "salary": 4500
+        "salary": 5500
       },
       {
-        "title": "Junior Front-End Engineer",
-        "years_of_experience": 3,
-        "salary": 5500
+        "title": "Senior Software Developer C#",
+        "years_of_experience": 2,
+        "salary": 10000
+      },
+      {
+        "title": "DevOps Software Engineer",
+        "years_of_experience": 2,
+        "salary": 8000
+      },
+      {
+        "title": "Junior JavaScript Developer",
+        "years_of_experience": 2,
+        "salary": 4000
+      },
+      {
+        "title": "Junior Front End Developer",
+        "years_of_experience": 0,
+        "salary": 3500
+      },
+      {
+        "title": "Front-end Developer",
+        "years_of_experience": 5,
+        "salary": 7000
+      },
+      {
+        "title": "Frontend React Deveoper",
+        "years_of_experience": 0,
+        "salary": 4800
       }
     ]
   }
 ]`);
 
+const domains: any[] = JSON.parse(`[
+  {
+    "keyword": "react",
+    "title": "frontend",
+    "score": 15
+  },
+  {
+    "keyword": "angular",
+    "title": "frontend",
+    "score": 15
+  },
+  {
+    "keyword": "vuejs",
+    "title": "frontend",
+    "score": 15
+  },
+  {
+    "keyword": "javascript",
+    "title": "frontend",
+    "score": 15
+  },
+  {
+    "keyword": "frontend",
+    "title": "frontend",
+    "score": 10
+  },
+  {
+    "keyword": "web",
+    "title": "frontend",
+    "score": 10
+  },
+  {
+    "keyword": "developer",
+    "title": "frontend",
+    "score": 5
+  },
+  {
+    "keyword": "engineer",
+    "title": "frontend",
+    "score": 5
+  },
+  {
+    "keyword": "software",
+    "title": "frontend",
+    "score": 1
+  },
+  {
+    "keyword": "qa",
+    "title": "qa",
+    "score": 15
+  },
+  {
+    "keyword": "automation",
+    "title": "qa",
+    "score": 15
+  },
+  {
+    "keyword": "engineer",
+    "title": "qa",
+    "score": 5
+  },
+  {
+    "keyword": "software",
+    "title": "qa",
+    "score": 5
+  },
+  {
+    "keyword": "tester",
+    "title": "qa",
+    "score": 5
+  }
+]`);
 
 class ContentScripts {
   constructor() {
@@ -118,7 +215,11 @@ class ContentScripts {
     return (longerLength - this.levenshtein(longer, shorter)) / longerLength;
   }
 
-  matchCompanyName(companyName: string, data: any): object | undefined {
+  formatString(s: string): string {
+    return s.replace(/[.,\/!$%\^&\*;:{}=\-_`~()]/g, '').replace(/\s{2,}/g, ' ').toLowerCase();
+  }
+
+  matchCompanyName(companyName: string, data: any[]): object | undefined {
     for (const company of data) {
       if (company.company_name.includes(companyName)) {
         return company;
@@ -128,42 +229,33 @@ class ContentScripts {
     return undefined;
   }
 
-  matchPositions(positionTitle: string, positions: any[], ngramLength: number = 2): any[] {
-    // positionTitle = React Developer
-
-    // React Engineer
-    // Senior .NET C# Developer -> Senior .NET, .NET C#, C# Developer
-
+  matchPositions(positionTitle: string, positions: any[]): any[] {
     const matches: any[] = [];
 
-    positionTitle = positionTitle.replace('-', '').toLowerCase();
-    
-    for (const position of positions) {
-      const words: string[] = position.title.replace('-', '').toLowerCase().split(' ');
-
-      const ngrams: any[] = [];
-      for (let i = 0; i < words.length - 1; i++) {
-        ngrams.push({
-          word: words[i] + ' ' + words[i + 1]
-        });
-      }
-      
-      let score;
-      for (const ngram of ngrams) {
-        score = 0.5;
-
-        if (this.similarity(positionTitle, ngram.word) > 0.6) {
-          score += 0.2;
-        } else {
-          score -= 0.1;
+    const positionTitleWords: string[] = this.formatString(positionTitle).split(' ');
+    let domainScore: any = {
+      domainTitle: '',
+      score: 0
+    };
+    for (const positionTitleWord of positionTitleWords) {
+      for (const domain of domains) {
+        if (this.similarity(positionTitleWord, domain.keyword) > 0.6) {
+          domainScore = {
+            domainTitle: domain.title,
+            score: domainScore.score + domain.score
+          };
         }
       }
+    }
 
-      if (score > 0.5) {
-        matches.push({
-          position: position,
-          score: score
-        });
+    if (domainScore.score > 0) {
+      for (const position of positions) {
+        const words: any[] = this.formatString(position.title).split(' ');
+        for (const word of words) {
+          if (this.similarity(domainScore.domainTitle, word) > 0.6) {
+            matches.push(position);
+          }
+        }
       }
     }
 
@@ -196,6 +288,8 @@ class ContentScripts {
                   }
 
                   const positionMatches: any = this.matchPositions(positionTitle, companyNameMatch.positions);
+                  console.table(positionTitle, positionMatches);
+                  
                   if (positionMatches.length) {
                     const salaryData: SalaryData = {
                       range: {
@@ -205,13 +299,13 @@ class ContentScripts {
                     };
 
                     if (positionMatches.length > 1) {
-                      const salaries: number[] = positionMatches.map((o: { position: { salary: any; }; }) => o.position.salary).sort((a: number, b: number) => a - b);
+                      const salaries: number[] = positionMatches.map((o: { salary: any; }) => o.salary).sort((a: number, b: number) => a - b);
                       salaryData.range = {
                         min: salaries[0],
                         max: salaries[salaries.length - 1]
                       };
                     } else {
-                      salaryData.range.min = positionMatches[0].position.salary;
+                      salaryData.range.min = positionMatches[0].salary;
                     }
 
                     if (salaryData.range.min) {

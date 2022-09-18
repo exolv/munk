@@ -5,6 +5,7 @@ const TerserPlugin = require('terser-webpack-plugin');
 module.exports = (env, options) => {
   return {
     target: 'web',
+    devtool: 'source-map',
     entry: {
       content_scripts: './src/content-scripts/content_scripts.tsx',
       popup: './src/popup/popup.tsx',
@@ -68,7 +69,7 @@ module.exports = (env, options) => {
       })
     ],
     optimization: {
-      minimize: true,
+      minimize: false,
       minimizer: [
         new TerserPlugin({
           terserOptions: {

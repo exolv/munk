@@ -7,7 +7,7 @@
   "license": "ISC",
   "main": "index.js",
   "scripts": {
-    "start": "webpack --mode development --watch --no-devtool",
+    "start": "webpack --mode development --watch",
     "build": "webpack --mode production --env type=chrome",
     "build-firefox": "webpack --mode production --env type=firefox",
     "clean": "rm -r build"
