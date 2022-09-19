@@ -276,7 +276,6 @@ class ContentScripts {
 
       if (score > 10) {
         matches.push(position);
-        break;
       }
     }
     
