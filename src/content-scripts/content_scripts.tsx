@@ -4,6 +4,86 @@ import { createRoot, Root } from 'react-dom/client';
 import { Rating, RatingData } from '../components/rating/Rating';
 import { Salary, SalaryData } from '../components/salary/Salary';
 
+const stopwords: string[] = ['a', 'about', 'above', 'after', 'again', 'against', 'all', 'am', 'an', 'and', 'any', 'are', 'aren\'t', 'as', 'at', 'be', 'because', 'been', 'before', 'being', 'below', 'between', 'both', 'but', 'by', 'can\'t', 'cannot', 'could', 'couldn\'t', 'did', 'didn\'t', 'do', 'does', 'doesn\'t', 'doing', 'don\'t', 'down', 'during', 'each', 'few', 'for', 'from', 'further', 'had', 'hadn\'t', 'has', 'hasn\'t', 'have', 'haven\'t', 'having', 'he', 'he\'d', 'he\'ll', 'he\'s', 'her', 'here', 'here\'s', 'hers', 'herself', 'him', 'himself', 'his', 'how', 'how\'s', 'i', 'i\'d', 'i\'ll', 'i\'m', 'i\'ve', 'if', 'in', 'into', 'is', 'isn\'t', 'it', 'it\'s', 'its', 'itself', 'let\'s', 'me', 'more', 'most', 'mustn\'t', 'my', 'myself', 'no', 'nor', 'not', 'of', 'off', 'on', 'once', 'only', 'or', 'other', 'ought', 'our', 'ours', 'ourselves', 'out', 'over', 'own', 'same', 'shan\'t', 'she', 'she\'d', 'she\'ll', 'she\'s', 'should', 'shouldn\'t', 'so', 'some', 'such', 'than', 'that', 'that\'s', 'the', 'their', 'theirs', 'them', 'themselves', 'then', 'there', 'there\'s', 'these', 'they', 'they\'d', 'they\'ll', 'they\'re', 'they\'ve', 'this', 'those', 'through', 'to', 'too', 'under', 'until', 'up', 'very', 'was', 'wasn\'t', 'we', 'we\'d', 'we\'ll', 'we\'re', 'we\'ve', 'were', 'weren\'t', 'what', 'what\'s', 'when', 'when\'s', 'where', 'where\'s', 'which', 'while', 'who', 'who\'s', 'whom', 'why', 'why\'s', 'with', 'won\'t', 'would', 'wouldn\'t', 'you', 'you\'d', 'you\'ll', 'you\'re', 'you\'ve', 'your', 'yours', 'yourself', 'yourselves'];
+
+const domains: any = [
+  {
+    title: 'backend',
+    keywords: [
+      {
+        title: 'c',
+        score: 15
+      },
+      {
+        title: 'c#',
+        score: 15
+      },
+      {
+        title: 'net',
+        score: 15
+      },
+      {
+        title: 'ruby',
+        score: 15
+      },
+      {
+        title: 'python',
+        score: 15
+      },
+      {
+        title: 'fullstack',
+        score: 10
+      }
+    ]
+  },
+  {
+    title: 'qa',
+    keywords: [
+      {
+        title: 'quality',
+        score: 15
+      },
+      {
+        title: 'assurance',
+        score: 15
+      },
+      {
+        title: 'automation',
+        score: 10
+      },
+      {
+        title: 'analytics',
+        score: 10
+      }
+    ]
+  },
+  {
+    title: 'frontend',
+    keywords: [
+      {
+        title: 'react',
+        score: 15
+      },
+      {
+        title: 'angular',
+        score: 15
+      },
+      {
+        title: 'vuejs',
+        score: 15
+      },
+      {
+        title: 'javascript',
+        score: 15
+      },
+      {
+        title: 'web',
+        score: 10
+      }
+    ]
+  },
+];
+
 const data: any[] = JSON.parse(`[
   {
     "company_name": "Micro Focus",
@@ -13,6 +93,11 @@ const data: any[] = JSON.parse(`[
         "title": "Software Development Intern",
         "years_of_experience": 1,
         "salary": 3000
+      },
+      {
+        "title": "QA Automation Engineer",
+        "years_of_experience": 2,
+        "salary": 5300
       },
       {
         "title": "Renewal Sales Representative",
@@ -80,81 +165,6 @@ const data: any[] = JSON.parse(`[
 ]`);
 
 class ContentScripts {
-  stopwords: string[] = ["a", "about", "above", "after", "again", "against", "all", "am", "an", "and", "any", "are", "aren't", "as", "at", "be", "because", "been", "before", "being", "below", "between", "both", "but", "by", "can't", "cannot", "could", "couldn't", "did", "didn't", "do", "does", "doesn't", "doing", "don't", "down", "during", "each", "few", "for", "from", "further", "had", "hadn't", "has", "hasn't", "have", "haven't", "having", "he", "he'd", "he'll", "he's", "her", "here", "here's", "hers", "herself", "him", "himself", "his", "how", "how's", "i", "i'd", "i'll", "i'm", "i've", "if", "in", "into", "is", "isn't", "it", "it's", "its", "itself", "let's", "me", "more", "most", "mustn't", "my", "myself", "no", "nor", "not", "of", "off", "on", "once", "only", "or", "other", "ought", "our", "ours", "ourselves", "out", "over", "own", "same", "shan't", "she", "she'd", "she'll", "she's", "should", "shouldn't", "so", "some", "such", "than", "that", "that's", "the", "their", "theirs", "them", "themselves", "then", "there", "there's", "these", "they", "they'd", "they'll", "they're", "they've", "this", "those", "through", "to", "too", "under", "until", "up", "very", "was", "wasn't", "we", "we'd", "we'll", "we're", "we've", "were", "weren't", "what", "what's", "when", "when's", "where", "where's", "which", "while", "who", "who's", "whom", "why", "why's", "with", "won't", "would", "wouldn't", "you", "you'd", "you'll", "you're", "you've", "your", "yours", "yourself", "yourselves"];
-  domains: any = [
-    {
-      title: 'backend',
-      keywords: [
-        {
-          title: 'c',
-          score: 15
-        },
-        {
-          title: 'c#',
-          score: 15
-        },
-        {
-          title: 'net',
-          score: 15
-        },
-        {
-          title: 'ruby',
-          score: 15
-        },
-        {
-          title: 'python',
-          score: 15
-        },
-        {
-          title: 'fullstack',
-          score: 10
-        }
-      ]
-    },
-    {
-      title: 'qa',
-      keywords: [
-        {
-          title: 'quality',
-          score: 15
-        },
-        {
-          title: 'assurance',
-          score: 15
-        },
-        {
-          title: 'automation',
-          score: 10
-        }
-      ]
-    },
-    {
-      title: 'frontend',
-      keywords: [
-        {
-          title: 'react',
-          score: 15
-        },
-        {
-          title: 'angular',
-          score: 15
-        },
-        {
-          title: 'vuejs',
-          score: 15
-        },
-        {
-          title: 'javascript',
-          score: 15
-        },
-        {
-          title: 'web',
-          score: 10
-        }
-      ]
-    },
-  ];
-
   constructor() {
     //
   }
@@ -218,7 +228,7 @@ class ContentScripts {
     const words: string[] = s.toLowerCase().replace('-', '').replace(/\W/g, ' ').replace(/\s+/g, ' ').trim().split(' ');
     const tokens: string[] = [];
     for (let i = 0; i < words.length; i++) {
-      if (this.stopwords.indexOf(words[i]) === -1) {
+      if (stopwords.indexOf(words[i]) === -1) {
         tokens.push(words[i]);
       }
     }
@@ -244,7 +254,7 @@ class ContentScripts {
         title: '',
         score: 0
       };
-      for (const domain of this.domains) {
+      for (const domain of domains) {
         if (this.similarity(positionTitleWord, domain.title) > sensitivity) {
           relevantKeyword.title = domain.title;
           relevantKeyword.score += 20;
