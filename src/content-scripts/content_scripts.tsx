@@ -3,6 +3,7 @@ import { createRoot, Root } from 'react-dom/client';
 
 import { Rating, RatingData } from '../components/rating/Rating';
 import { Salary, SalaryData } from '../components/salary/Salary';
+import { MunkButton } from '../components/munk-button/MunkButton';
 
 const stopwords: string[] = ['a', 'about', 'above', 'after', 'again', 'against', 'all', 'am', 'an', 'and', 'any', 'are', 'aren\'t', 'as', 'at', 'be', 'because', 'been', 'before', 'being', 'below', 'between', 'both', 'but', 'by', 'can\'t', 'cannot', 'could', 'couldn\'t', 'did', 'didn\'t', 'do', 'does', 'doesn\'t', 'doing', 'don\'t', 'down', 'during', 'each', 'few', 'for', 'from', 'further', 'had', 'hadn\'t', 'has', 'hasn\'t', 'have', 'haven\'t', 'having', 'he', 'he\'d', 'he\'ll', 'he\'s', 'her', 'here', 'here\'s', 'hers', 'herself', 'him', 'himself', 'his', 'how', 'how\'s', 'i', 'i\'d', 'i\'ll', 'i\'m', 'i\'ve', 'if', 'in', 'into', 'is', 'isn\'t', 'it', 'it\'s', 'its', 'itself', 'let\'s', 'me', 'more', 'most', 'mustn\'t', 'my', 'myself', 'no', 'nor', 'not', 'of', 'off', 'on', 'once', 'only', 'or', 'other', 'ought', 'our', 'ours', 'ourselves', 'out', 'over', 'own', 'same', 'shan\'t', 'she', 'she\'d', 'she\'ll', 'she\'s', 'should', 'shouldn\'t', 'so', 'some', 'such', 'than', 'that', 'that\'s', 'the', 'their', 'theirs', 'them', 'themselves', 'then', 'there', 'there\'s', 'these', 'they', 'they\'d', 'they\'ll', 'they\'re', 'they\'ve', 'this', 'those', 'through', 'to', 'too', 'under', 'until', 'up', 'very', 'was', 'wasn\'t', 'we', 'we\'d', 'we\'ll', 'we\'re', 'we\'ve', 'were', 'weren\'t', 'what', 'what\'s', 'when', 'when\'s', 'where', 'where\'s', 'which', 'while', 'who', 'who\'s', 'whom', 'why', 'why\'s', 'with', 'won\'t', 'would', 'wouldn\'t', 'you', 'you\'d', 'you\'ll', 'you\'re', 'you\'ve', 'your', 'yours', 'yourself', 'yourselves'];
 
@@ -185,6 +186,14 @@ class ContentScripts {
     reactElement.render(<Salary {...data} />);
   }
 
+  renderButton(element: Element, id: number): void {
+    const root: HTMLDivElement = document.createElement('div');
+    root.classList.add('flex', 'justify-center', 'mt-2');
+    element.insertAdjacentElement('beforeend', root);
+    const reactElement: Root = createRoot(root);
+    reactElement.render(<MunkButton id={id} />);
+  }
+
   levenshtein(s1: string, s2: string) {
     const costs: number[] = [];
     for (let i = 0; i <= s1.length; i++) {
@@ -301,6 +310,11 @@ class ContentScripts {
             if (!(element instanceof HTMLElement)) continue;
 
             if (element.matches('.job-card-container')) {
+              const buttonPlace: Element = element.querySelector('.job-card-container__action--visible-on-hover');
+              if (buttonPlace) {
+                this.renderButton(buttonPlace, parseInt(element.dataset.jobId));
+              }
+
               let companyName: Element | string = element.querySelector('.job-card-container__company-name');
               let positionTitle: Element | string = element.querySelector('.job-card-list__title');
               if (companyName && positionTitle) {

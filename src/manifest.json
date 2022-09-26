@@ -1,10 +1,12 @@
 {
-  "version": "1.0",
+  "version": "0.1",
   "name": "munk",
   "description": "Extinde LinkedIn cu informații de pe Undelucram.",
   "author": "xsuve",
   "manifest_version": 3,
-  "permissions": [],
+  "permissions": [
+    "storage"
+  ],
   "options_page": "options.html",
   "content_scripts": [
     {
