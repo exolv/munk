@@ -7,19 +7,26 @@ import {
   ChevronRightIcon
 } from '@heroicons/react/24/outline';
 
+import { set } from '../../services/StorageService';
+
 import '../../styles.css';
 
 export const MunkButton: FC<{id: number}> = ({ id }) => {
+  const trackJob = async () => {
+    //
+    
+  }
+
   return (
     <button className='group relative cursor-pointer'>
       <img src={chrome.runtime.getURL('assets/img/munk-icon.svg')} className='w-10 h-10 pb-2' />
       <div className='min-w-[180px] absolute top-10 -right-2 bg-white rounded-xl drop-shadow-munk z-50 hidden group-hover:!block'>
-        <div className='w-4 h-4 transform rotate-45 absolute bg-white -top-1 right-[12px]'></div>
+        <div className='w-4 h-4 transform rotate-45 absolute bg-white -top-1 right-[12px] -z-10'></div>
         <ul className='text-left overflow-hidden py-2'>
-          <li className='px-5 py-2.5 hover:bg-gray-100 flex items-center justify-between'>
+          <li className='px-5 py-2.5 hover:bg-gray-100 flex items-center justify-between' onClick={() => trackJob()}>
             <div className='flex items-center'>
               <PlusCircleIcon className='w-7 h-7 text-gray-500 mr-3' />
-              <span className='font-poppins font-normal text-[12px] text-gray-500'>Adaugă</span>
+              <span className='font-poppins font-normal text-[12px] text-gray-500'>Urmărește</span>
             </div>
           </li>
           <li className='px-5 py-2.5 hover:bg-gray-100 flex items-center justify-between'>
