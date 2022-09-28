@@ -2,35 +2,35 @@ import React, { FC, useState } from 'react';
 
 import '../../styles.css';
 
-enum Status {
-  ASTEPTARE = 'Așteptare',
-  INTERVIU = 'Interviu',
-  ACCEPTAT = 'Acceptat'
+export enum Status {
+  APPLIED = 'Aplicat',
+  INTERVIEW = 'Interviu',
+  OFFER = 'Ofertă'
 }
 
 export const JobBox: FC = () => {
-  const { ASTEPTARE, INTERVIU, ACCEPTAT } = Status;
-  const [status, setStatus] = useState<Status>(ASTEPTARE);
+  const { APPLIED, INTERVIEW, OFFER } = Status;
+  const [status, setStatus] = useState<Status>(APPLIED);
   const changeStatus = () => {
     switch (status) {
-      case ASTEPTARE:
-        setStatus(INTERVIU);
+      case APPLIED:
+        setStatus(INTERVIEW);
       break;
-      case INTERVIU:
-        setStatus(ACCEPTAT);
+      case INTERVIEW:
+        setStatus(OFFER);
       break;
-      case ACCEPTAT:
-        setStatus(ASTEPTARE);
+      case OFFER:
+        setStatus(APPLIED);
       break;
     }
   }
 
   return (
-    <div className='min-h-[100px] bg-white p-4 rounded-lg drop-shadow-munk'>
+    <div className='min-h-[100px] bg-white px-5 py-4 rounded-lg drop-shadow-munk'>
       <span className='font-poppins text-sm font-normal'>Junior Frontend Developer</span>
       <p className='font-poppins text-[13px] font-normal text-gray-400 mb-4'>Luxoft</p>
       <button
-        className={`font-poppins rounded-[4px] text-white text-[11px] px-1.5 py-0.5 inline-block tracking-wide ${status === ASTEPTARE ? 'bg-red-500' : (status === INTERVIU ? 'bg-yellow-500' : 'bg-green-500')}`}
+        className={`font-poppins rounded-[4px] text-white text-[11px] px-1.5 py-0.5 inline-block tracking-wide ${status === APPLIED ? 'bg-red-500' : (status === INTERVIEW ? 'bg-yellow-500' : 'bg-green-500')}`}
         onClick={() => changeStatus()}
       >{status}</button>
     </div>

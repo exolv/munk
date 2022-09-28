@@ -10,7 +10,8 @@ module.exports = (env, options) => {
       content_scripts: './src/content-scripts/content_scripts.tsx',
       popup: './src/popup/popup.tsx',
       options: './src/options/options.tsx',
-      background: './src/background.tsx'
+      background: './src/background.tsx',
+      app: './src/app/app.tsx'
     },
     output: {
       filename: '[name].js',
@@ -47,6 +48,11 @@ module.exports = (env, options) => {
           },
           {
             from: './src/styles.css',
+            to: path.resolve(__dirname, 'build'),
+            force: true
+          },
+          {
+            from: './src/app/app.html',
             to: path.resolve(__dirname, 'build'),
             force: true
           },

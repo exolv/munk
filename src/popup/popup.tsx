@@ -4,15 +4,14 @@ import { createRoot } from 'react-dom/client';
 import '../styles.css';
 
 import { Navbar } from '../components/navbar/Navbar';
-import { JobBox } from '../components/job-box/JobBox';
+import { Timeline } from '../components/timeline/Timeline';
 
 const Popup: FC = () => {
   return (
-    <div className='w-[420px] h-[640px] bg-gray-100'>
+    <div className='w-[360px] h-[640px] bg-gray-100'>
       <Navbar />
-      <div className='p-6'>
-        <JobBox />
-      </div>
+
+      <Timeline />
     </div>
   );
 }

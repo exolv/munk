@@ -4,6 +4,29 @@
 
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;700&display=swap');
 
+/* General */
 .drop-shadow-munk {
   box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
+}
+
+/* Timeline */
+.timeline::after {
+  content: '';
+  @apply absolute top-0 left-0 bg-gray-300 h-full w-[2px] rounded-md;
+}
+.timeline-log::after {
+  content: '';
+  @apply absolute top-[20px] -left-[29px] w-3 h-3 rounded-full z-40 bg-cyan-500;
+}
+.timeline-log-color-cyan::after {
+  @apply bg-cyan-500;
+}
+.timeline-log-color-red::after {
+  @apply bg-red-500;
+}
+.timeline-log-color-yellow::after {
+  @apply bg-yellow-500;
+}
+.timeline-log-color-green::after {
+  @apply bg-green-500;
 }
