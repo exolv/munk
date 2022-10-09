@@ -3,16 +3,11 @@ import {
   InformationCircleIcon
 } from '@heroicons/react/24/outline';
 
+import SalaryData from '../../interfaces/SalaryData';
+
 import '../../styles.css';
 
-export interface SalaryData {
-  range: {
-    min: number;
-    max: number | undefined;
-  };
-}
-
-export const Salary: FC<SalaryData> = ({ range }) => {
+const Salary: FC<SalaryData> = ({ range }) => {
   const rangeMiddle: number = range.max ? Math.floor((range.min + range.max) / 2) : range.min;
 
   return (
@@ -62,3 +57,5 @@ export const Salary: FC<SalaryData> = ({ range }) => {
     </div>
   );
 }
+
+export default Salary;

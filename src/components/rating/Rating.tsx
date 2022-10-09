@@ -1,13 +1,10 @@
 import React, { FC } from 'react';
 
+import RatingData from '../../interfaces/RatingData';
+
 import '../../styles.css';
 
-export interface RatingData {
-  rating: number;
-  displayLogo: boolean;
-}
-
-export const Rating: FC<RatingData> = ({ rating, displayLogo }) => {
+const Rating: FC<RatingData> = ({ rating, displayLogo }) => {
   return (
     <div className='flex justify-between items-center'>
       <div className='mx-3'>|</div>
@@ -34,3 +31,5 @@ export const Rating: FC<RatingData> = ({ rating, displayLogo }) => {
     </div>
   );
 }
+
+export default Rating;
