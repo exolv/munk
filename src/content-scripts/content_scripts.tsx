@@ -335,8 +335,6 @@ class ContentScripts {
                   }
 
                   const positionMatches: any = this.matchPositions(positionTitle, companyNameMatch.positions);
-                  console.log(positionTitle, positionMatches);
-                  
                   if (positionMatches.length) {
                     const salaryData: SalaryData = {
                       range: {

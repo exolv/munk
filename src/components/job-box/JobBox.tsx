@@ -1,16 +1,12 @@
 import React, { FC, useState } from 'react';
 
+import { TrackedJobStatus } from '../../interfaces/TrackedJobStatus';
+
 import '../../styles.css';
 
-export enum Status {
-  APPLIED = 'Aplicat',
-  INTERVIEW = 'Interviu',
-  OFFER = 'Ofertă'
-}
-
 export const JobBox: FC = () => {
-  const { APPLIED, INTERVIEW, OFFER } = Status;
-  const [status, setStatus] = useState<Status>(APPLIED);
+  const { APPLIED, INTERVIEW, OFFER } = TrackedJobStatus;
+  const [status, setStatus] = useState<TrackedJobStatus>(APPLIED);
   const changeStatus = () => {
     switch (status) {
       case APPLIED:

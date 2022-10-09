@@ -26,6 +26,9 @@ body {
   @apply absolute top-[23px] -left-[26px] w-1.5 h-1.5 rounded-full z-40 bg-white;
 }
 .timeline-log-color-cyan::after {
+  @apply bg-gray-500;
+}
+.timeline-log-color-cyan::after {
   @apply bg-cyan-500;
 }
 .timeline-log-color-red::after {

@@ -7,9 +7,10 @@ import {
   ChevronRightIcon
 } from '@heroicons/react/24/outline';
 
-import storage from '../../services/StorageService';
-
 import '../../styles.css';
+
+import storage from '../../services/StorageService';
+import { TrackedJobStatus } from '../../interfaces/TrackedJobStatus';
 
 enum TrackBtnState {
   DEFAULT = 'Urmărește',
@@ -22,7 +23,6 @@ const MunkButton: FC<{id: number}> = ({ id }) => {
   useEffect(() => {
     (async () => {
       const getTrackedJob = await storage.getTrackedJob(id);
-      
       if (getTrackedJob) {
         setTrackBtnState(TrackBtnState.TRACKING);
       }
@@ -38,9 +38,21 @@ const MunkButton: FC<{id: number}> = ({ id }) => {
         companyName = companyName.textContent.trim().replace(/\n/g, '');
         positionTitle = positionTitle.textContent.trim().replace(/\n/g, '');
 
-        const addTrackedJob = await storage.addTrackedJob({ id, positionTitle, companyName });
+        const addTrackedJob: any = await storage.addTrackedJob({
+          id: id,
+          positionTitle: positionTitle,
+          companyName: companyName,
+          date: new Date()
+        });
         if (addTrackedJob) {
           setTrackBtnState(TrackBtnState.TRACKING);
+          await storage.addTimelineLog({
+            positionTitle: positionTitle,
+            companyName: companyName,
+            date: new Date(),
+            status: TrackedJobStatus.TRACKING,
+            title: `Urmărești jobul ${positionTitle}.`
+          });
         }
       }
     }
