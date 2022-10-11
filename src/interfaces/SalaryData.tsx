@@ -1,6 +1,10 @@
 export default interface SalaryData {
-  range: {
+  companyPositionRange: {
     min: number;
     max: number | undefined;
+  };
+  globalPositionRange: {
+    min: number;
+    max: number;
   };
 }

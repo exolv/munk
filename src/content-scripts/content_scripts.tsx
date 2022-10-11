@@ -337,23 +337,27 @@ class ContentScripts {
                   const positionMatches: any = this.matchPositions(positionTitle, companyNameMatch.positions);
                   if (positionMatches.length) {
                     const salaryData: SalaryData = {
-                      range: {
+                      companyPositionRange: {
                         min: 0,
                         max: undefined
+                      },
+                      globalPositionRange: {
+                        min: 3000,
+                        max: 12000 // TODO: Get global position salary range
                       }
                     };
 
                     if (positionMatches.length > 1) {
                       const salaries: number[] = positionMatches.map((o: { salary: any; }) => o.salary).sort((a: number, b: number) => a - b);
-                      salaryData.range = {
+                      salaryData.companyPositionRange = {
                         min: salaries[0],
                         max: salaries[salaries.length - 1]
                       };
                     } else {
-                      salaryData.range.min = positionMatches[0].salary;
+                      salaryData.companyPositionRange.min = positionMatches[0].salary;
                     }
 
-                    if (salaryData.range.min) {
+                    if (salaryData.companyPositionRange.min && salaryData.companyPositionRange.min > 0) {
                       const salaryPlace: Element = element.querySelector('.job-card-list__footer-wrapper');
                       if (salaryPlace) {
                         this.renderSalary(salaryPlace, salaryData);
