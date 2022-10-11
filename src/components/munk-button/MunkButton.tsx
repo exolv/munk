@@ -1,6 +1,7 @@
 import React, { FC, useEffect, useState } from 'react';
 import {
   PlusCircleIcon,
+  CheckCircleIcon,
   StarIcon,
   CurrencyDollarIcon,
   ArrowTopRightOnSquareIcon,
@@ -66,7 +67,12 @@ const MunkButton: FC<{id: number}> = ({ id }) => {
         <ul className='text-left overflow-hidden py-2'>
           <li className='px-5 py-2.5 hover:bg-gray-100 flex items-center justify-between' onClick={() => trackBtnState === TrackBtnState.DEFAULT && trackJob()}>
             <div className='flex items-center'>
-              <PlusCircleIcon className={`w-7 h-7 ${trackBtnState === TrackBtnState.TRACKING ? 'text-gray-400' : 'text-gray-500'} mr-3`} />
+              {
+                trackBtnState === TrackBtnState.TRACKING ?
+                  <CheckCircleIcon className='w-7 h-7 text-gray-400 mr-3' />
+                :
+                  <PlusCircleIcon className='w-7 h-7 text-gray-500 mr-3' />
+              }
               <span className={`font-poppins font-normal text-[12px] ${trackBtnState === TrackBtnState.TRACKING ? 'text-gray-400' : 'text-gray-500'}`}>{trackBtnState}</span>
             </div>
           </li>
