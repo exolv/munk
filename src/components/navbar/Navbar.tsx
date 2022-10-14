@@ -6,7 +6,7 @@ import {
 
 import '../../styles.css';
 
-export const Navbar: FC = () => {
+const Navbar: FC = () => {
   return (
     <div className='fixed top-0 left-0 right-0 bg-white px-6 py-3 flex justify-between items-center rounded-b-xl drop-shadow-munk z-50'>
       <div className='flex items-center'>
@@ -24,3 +24,5 @@ export const Navbar: FC = () => {
     </div>
   );
 }
+
+export default Navbar;

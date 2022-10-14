@@ -3,8 +3,8 @@ import { createRoot } from 'react-dom/client';
 
 import '../styles.css';
 
-import { Navbar } from '../components/navbar/Navbar';
-import { Timeline } from '../components/timeline/Timeline';
+import Navbar from '../components/navbar/Navbar';
+import Timeline from '../components/timeline/Timeline';
 
 const Popup: FC = () => {
   return (

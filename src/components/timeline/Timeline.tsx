@@ -9,7 +9,7 @@ import { TrackedJobStatus } from '../../interfaces/TrackedJobStatus';
 import storage from '../../services/StorageService';
 import TimelineLog from '../../interfaces/TimelineLog';
 
-export const Timeline: FC = () => {
+const Timeline: FC = () => {
   const [timelineLogs, setTimelineLogs] = useState<TimelineLog[]>([]);
   useEffect(() => {
     (async () => {
@@ -60,3 +60,5 @@ export const Timeline: FC = () => {
     </div>
   );
 }
+
+export default Timeline;

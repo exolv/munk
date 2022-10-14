@@ -35,15 +35,19 @@ const MunkButton: FC<{id: number}> = ({ id }) => {
     if (element) {
       let companyName: Element | string = element.querySelector('.job-card-container__company-name');
       let positionTitle: Element | string = element.querySelector('.job-card-list__title');
-      if (companyName && positionTitle) {
+      let companyImage: Element | string = element.querySelector('.artdeco-entity-lockup__image--type-square img');
+
+      if (companyName && positionTitle && companyImage) {
         companyName = companyName.textContent.trim().replace(/\n/g, '');
         positionTitle = positionTitle.textContent.trim().replace(/\n/g, '');
+        companyImage = companyImage.getAttribute('src');
 
         const addTrackedJob: any = await storage.addTrackedJob({
           id: id,
           positionTitle: positionTitle,
           companyName: companyName,
-          date: new Date()
+          date: new Date(),
+          companyImage: companyImage
         });
         if (addTrackedJob) {
           setTrackBtnState(TrackBtnState.TRACKING);

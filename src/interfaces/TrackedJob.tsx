@@ -3,4 +3,5 @@ export default interface TrackedJob {
   positionTitle: string;
   companyName: string;
   date: Date;
+  companyImage: string;
 }

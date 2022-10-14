@@ -9,11 +9,11 @@ const storage = {
           if (result['trackedJobs'] && result['trackedJobs'].length > 0) {
             chrome.storage.sync.set({ ['trackedJobs']: [...result['trackedJobs'], value] }, () => {
               resolve(value);
-            })
+            });
           } else {
             chrome.storage.sync.set({ ['trackedJobs']: [value] }, () => {
               resolve(value);
-            })
+            });
           }
         });
       } catch (error) {
@@ -46,6 +46,23 @@ const storage = {
     });
   },
 
+  removeTrackedJob: async (id: number) => {
+    return new Promise((resolve, reject) => {
+      try {
+        chrome.storage.sync.get(['trackedJobs'], (result) => {
+          if (result['trackedJobs'] && result['trackedJobs'].length > 0) {
+            const filteredTrackedJobs: TrackedJob[] = result['trackedJobs'].filter((job: TrackedJob) => job.id !== id);
+            chrome.storage.sync.set({ ['trackedJobs']: [...filteredTrackedJobs] }, () => {
+              resolve(filteredTrackedJobs);
+            });
+          }
+        });
+      } catch (error) {
+        reject(error);
+      }
+    });
+  },
+
   addTimelineLog: async (value: TimelineLog) => {
     return new Promise((resolve, reject) => {
       try {
@@ -57,7 +74,7 @@ const storage = {
           } else {
             chrome.storage.sync.set({ ['timelineLogs']: [value] }, () => {
               resolve(value);
-            })
+            });
           }
         });
       } catch (error) {
@@ -85,11 +102,11 @@ const storage = {
           if (result[key] && result[key].length > 0) {
             chrome.storage.sync.set({ [key]: [...result[key], value] }, () => {
               resolve(value);
-            })
+            });
           } else {
             chrome.storage.sync.set({ [key]: [value] }, () => {
               resolve(value);
-            })
+            });
           }
         });
       } catch (error) {
