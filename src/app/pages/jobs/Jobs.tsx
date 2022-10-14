@@ -61,7 +61,7 @@ const Jobs: FC = () => {
 
             <div className='bg-white p-5 rounded-xl mr-10 w-[300px] min-h-[300px]'>
               <div className='flex items-center justify-between'>
-                <h6 className='font-poppins font-medium text-sm'>Aplicări</h6>
+                <h6 className='font-poppins font-medium text-sm'>Interviuri</h6>
                 <EllipsisHorizontalIcon className='w-6 h-6 text-gray-400 cursor-pointer' />
               </div>
               <div>
@@ -71,7 +71,7 @@ const Jobs: FC = () => {
 
             <div className='bg-white p-5 rounded-xl w-[300px] min-h-[300px]'>
               <div className='flex items-center justify-between'>
-                <h6 className='font-poppins font-medium text-sm'>Aplicări</h6>
+                <h6 className='font-poppins font-medium text-sm'>Oferte</h6>
                 <EllipsisHorizontalIcon className='w-6 h-6 text-gray-400 cursor-pointer' />
               </div>
               <div>
