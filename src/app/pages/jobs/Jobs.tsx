@@ -29,10 +29,10 @@ const Jobs: FC = () => {
       <div className='bg-gray-100 w-full min-h-screen'>
         <Navbar title='Job-uri' />
 
-        <div className='px-32 py-24'>
+        <div className='pl-32 pr-20 py-24'>
           <div className='flex'>
 
-            <div className='bg-white p-5 rounded-xl mr-10 w-[300px] min-h-[300px]'>
+            <div className='bg-white p-5 rounded-xl mr-10 w-[calc(25%-30px)] min-h-[300px]'>
               <div className='flex items-center justify-between'>
                 <h6 className='font-poppins font-medium text-sm'>Job-uri Salvate ({trackedJobs.length})</h6>
                 <EllipsisHorizontalIcon className='w-6 h-6 text-gray-400 cursor-pointer' />
@@ -49,7 +49,7 @@ const Jobs: FC = () => {
               </div>
             </div>
 
-            <div className='bg-white p-5 rounded-xl mr-10 w-[300px] min-h-[300px]'>
+            <div className='bg-white p-5 rounded-xl mr-10 w-[calc(25%-30px)] min-h-[300px]'>
               <div className='flex items-center justify-between'>
                 <h6 className='font-poppins font-medium text-sm'>Aplicări</h6>
                 <EllipsisHorizontalIcon className='w-6 h-6 text-gray-400 cursor-pointer' />
@@ -59,7 +59,7 @@ const Jobs: FC = () => {
               </div>
             </div>
 
-            <div className='bg-white p-5 rounded-xl mr-10 w-[300px] min-h-[300px]'>
+            <div className='bg-white p-5 rounded-xl mr-10 w-[calc(25%-30px)] min-h-[300px]'>
               <div className='flex items-center justify-between'>
                 <h6 className='font-poppins font-medium text-sm'>Interviuri</h6>
                 <EllipsisHorizontalIcon className='w-6 h-6 text-gray-400 cursor-pointer' />
@@ -69,7 +69,7 @@ const Jobs: FC = () => {
               </div>
             </div>
 
-            <div className='bg-white p-5 rounded-xl w-[300px] min-h-[300px]'>
+            <div className='bg-white p-5 rounded-xl w-[calc(25%-30px)] min-h-[300px]'>
               <div className='flex items-center justify-between'>
                 <h6 className='font-poppins font-medium text-sm'>Oferte</h6>
                 <EllipsisHorizontalIcon className='w-6 h-6 text-gray-400 cursor-pointer' />

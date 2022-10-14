@@ -16,7 +16,7 @@ const JobBox: FC<TrackedJob> = ({ id, companyImage, positionTitle, companyName }
 
   return (
     <div
-      className='relative bg-white p-5 rounded-lg border border-solid border-gray-100 mt-4 cursor-pointer flex items-start'
+      className='relative overflow-hidden bg-white p-5 rounded-lg border border-solid border-gray-100 mt-4 cursor-pointer flex items-start'
     >
       <div className='w-4 h-4 cursor-pointer absolute top-4 right-4 flex items-center justify-center' onClick={() => removeTrackedJob(id)}>
         <XMarkIcon className='w-4 h-4 text-gray-400 cursor-pointer' />
