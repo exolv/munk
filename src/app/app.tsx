@@ -6,6 +6,9 @@ import {
   RouterProvider
 } from 'react-router-dom';
 
+import { DndProvider } from 'react-dnd';
+import { HTML5Backend } from 'react-dnd-html5-backend';
+
 import '../styles.css';
 
 import Error from './pages/error/Error';
@@ -27,7 +30,9 @@ const router = createBrowserRouter([
 
 const App: FC = () => {
   return (
-    <RouterProvider router={router} />
+    <DndProvider backend={HTML5Backend}>
+      <RouterProvider router={router} />
+    </DndProvider>
   );
 }
 
