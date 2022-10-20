@@ -1,7 +1,10 @@
+import { BoardType } from './TrackedJobStatus';
+
 export default interface TrackedJob {
   id: number;
   positionTitle: string;
   companyName: string;
-  date: Date;
+  date: string;
   companyImage: string;
+  board: BoardType;
 }

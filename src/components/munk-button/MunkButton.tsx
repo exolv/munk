@@ -11,7 +11,7 @@ import {
 import '../../styles.css';
 
 import storage from '../../services/StorageService';
-import { TrackedJobStatus } from '../../interfaces/TrackedJobStatus';
+import { BoardType, TrackedJobStatus } from '../../interfaces/TrackedJobStatus';
 
 enum TrackBtnState {
   DEFAULT = 'Urmărește',
@@ -42,19 +42,20 @@ const MunkButton: FC<{id: number}> = ({ id }) => {
         positionTitle = positionTitle.textContent.trim().replace(/\n/g, '');
         companyImage = companyImage.getAttribute('src');
 
-        const addTrackedJob: any = await storage.addTrackedJob({
+        const addTrackedJob = await storage.addTrackedJob({
           id: id,
           positionTitle: positionTitle,
           companyName: companyName,
-          date: new Date(),
-          companyImage: companyImage
+          date: new Date().toISOString(),
+          companyImage: companyImage,
+          board: BoardType.TRACKING
         });
         if (addTrackedJob) {
           setTrackBtnState(TrackBtnState.TRACKING);
           await storage.addTimelineLog({
             positionTitle: positionTitle,
             companyName: companyName,
-            date: new Date(),
+            date: new Date().toISOString(),
             status: TrackedJobStatus.TRACKING,
             title: `Urmărești jobul ${positionTitle}.`
           });

@@ -38,7 +38,25 @@ const storage = {
     return new Promise((resolve, reject) => {
       try {
         chrome.storage.sync.get(['trackedJobs'], (result) => {
-          resolve(result['trackedJobs']?.find((log: TrackedJob) => log.id === id));
+          resolve(result['trackedJobs']?.find((job: TrackedJob) => job.id === id));
+        });
+      } catch (error) {
+        reject(error);
+      }
+    });
+  },
+
+  updateTrackedJob: async (id: number, data: TrackedJob) => {
+    return new Promise((resolve, reject) => {
+      try {
+        chrome.storage.sync.get(['trackedJobs'], (result) => {
+          if (result['trackedJobs'] && result['trackedJobs'].length > 0) {
+            const filteredTrackedJobs: TrackedJob[] = result['trackedJobs'].filter((job: TrackedJob) => job.id !== id);
+            filteredTrackedJobs.push(data);
+            chrome.storage.sync.set({ ['trackedJobs']: [...filteredTrackedJobs] }, () => {
+              resolve(filteredTrackedJobs);
+            });
+          }
         });
       } catch (error) {
         reject(error);

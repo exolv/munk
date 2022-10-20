@@ -10,10 +10,12 @@ import JobBox from '../../components/job-box/JobBox';
 import TrackedJob from '../../../interfaces/TrackedJob';
 import { BoardType } from '../../../interfaces/TrackedJobStatus';
 
-const Board: FC<{ type: BoardType; title: string; jobs: TrackedJob[] }> = ({ type, title, jobs }) => {
+const Board: FC<{ type: BoardType; title: string; jobs: TrackedJob[] }> = ({ type, title, jobs = [] }) => {
   const [{ canDrop, isOver }, drop] = useDrop(() => ({
     accept: 'JOB_BOX',
-    drop: () => ({ board: type }),
+    drop: () => ({
+      board: type
+    }),
     collect: (monitor) => ({
       isOver: monitor.isOver(),
       canDrop: monitor.canDrop(),
@@ -21,6 +23,7 @@ const Board: FC<{ type: BoardType; title: string; jobs: TrackedJob[] }> = ({ typ
   }));
 
   return (
+    jobs &&
     <div className='bg-white p-5 rounded-xl mr-10 w-[calc(25%-30px)]'>
       <div className='flex items-center justify-between mb-4'>
         <h6 className='font-poppins font-medium text-sm'>{title} ({jobs.length})</h6>

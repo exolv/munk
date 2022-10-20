@@ -1,23 +1,22 @@
-import React, { FC, useState, useEffect } from 'react';
+import React, { FC, useEffect, useState } from 'react';
+
+import { useSelector, useDispatch } from 'react-redux';
 
 import Navbar from '../../components/navbar/Navbar';
 import Sidebar from '../../components/sidebar/Sidebar';
 
-import storage from '../../../services/StorageService';
-import TrackedJob from '../../../interfaces/TrackedJob';
 import Board from '../../components/board/Board';
 import { BoardType } from '../../../interfaces/TrackedJobStatus';
+import TrackedJob from '../../../interfaces/TrackedJob';
+import { setInitialState } from '../../redux/slices/trackedJobsSlice';
 
 const Jobs: FC = () => {
-  const [trackedJobs, setTrackedJobs] = useState<TrackedJob[]>([]);
+  const dispatch = useDispatch<any>();
+  const trackedJobs = useSelector((state: any) => state.trackedJobs.value);
+
   useEffect(() => {
-    (async () => {
-      const trackedJobs: any = await storage.getTrackedJobs();
-      if (trackedJobs) {
-        setTrackedJobs(trackedJobs);
-      }
-    })();
-  }, []);
+    dispatch(setInitialState());
+  }, [dispatch]);
   
   const { TRACKING, APPLIED, INTERVIEWS, OFFERS } = BoardType;
 
@@ -29,10 +28,10 @@ const Jobs: FC = () => {
 
         <div className='pl-32 pr-20 py-24'>
           <div className='flex items-start'>
-            <Board type={TRACKING} title='Job-uri Salvate' jobs={trackedJobs} />
-            <Board type={APPLIED} title='Aplicări' jobs={[]} />
-            <Board type={INTERVIEWS} title='Interviuri' jobs={[]} />
-            <Board type={OFFERS} title='Oferte' jobs={[]} />
+            <Board type={TRACKING} title='Job-uri Salvate' jobs={trackedJobs?.filter((job: TrackedJob) => job.board === TRACKING)} />
+            <Board type={APPLIED} title='Aplicări' jobs={trackedJobs?.filter((job: TrackedJob) => job.board === APPLIED)} />
+            <Board type={INTERVIEWS} title='Interviuri' jobs={trackedJobs?.filter((job: TrackedJob) => job.board === INTERVIEWS)} />
+            <Board type={OFFERS} title='Oferte' jobs={trackedJobs?.filter((job: TrackedJob) => job.board === OFFERS)} />
           </div>
         </div>
       </div>

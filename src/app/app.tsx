@@ -9,6 +9,9 @@ import {
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 
+import { store } from './redux/store';
+import { Provider } from 'react-redux';
+
 import '../styles.css';
 
 import Error from './pages/error/Error';
@@ -30,9 +33,11 @@ const router = createBrowserRouter([
 
 const App: FC = () => {
   return (
-    <DndProvider backend={HTML5Backend}>
-      <RouterProvider router={router} />
-    </DndProvider>
+    <Provider store={store}>
+      <DndProvider backend={HTML5Backend}>
+        <RouterProvider router={router} />
+      </DndProvider>
+    </Provider>
   );
 }
 
