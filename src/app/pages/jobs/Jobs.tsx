@@ -24,11 +24,11 @@ const Jobs: FC = () => {
     <div className='flex'>
       <Sidebar active='jobs' />
       <div className='bg-gray-100 w-full min-h-screen'>
-        <Navbar title='Job-uri' />
+        <Navbar title='Joburi' />
 
         <div className='pl-32 pr-20 py-24'>
           <div className='flex items-start'>
-            <Board type={TRACKING} title='Job-uri Salvate' jobs={trackedJobs?.filter((job: TrackedJob) => job.board === TRACKING)} />
+            <Board type={TRACKING} title='Joburi Salvate' jobs={trackedJobs?.filter((job: TrackedJob) => job.board === TRACKING)} />
             <Board type={APPLIED} title='Aplicări' jobs={trackedJobs?.filter((job: TrackedJob) => job.board === APPLIED)} />
             <Board type={INTERVIEWS} title='Interviuri' jobs={trackedJobs?.filter((job: TrackedJob) => job.board === INTERVIEWS)} />
             <Board type={OFFERS} title='Oferte' jobs={trackedJobs?.filter((job: TrackedJob) => job.board === OFFERS)} />
