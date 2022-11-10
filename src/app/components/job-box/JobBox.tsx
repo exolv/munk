@@ -12,7 +12,7 @@ import { remove, update } from '../../redux/slices/trackedJobsSlice';
 
 import storage from '../../../services/StorageService';
 import TrackedJob from '../../../interfaces/TrackedJob';
-import { BoardType } from '../../../interfaces/TrackedJobStatus';
+import { BoardType, TrackedJobStatus } from '../../../interfaces/TrackedJobStatus';
 
 const JobBox: FC<TrackedJob> = ({ id, companyImage, positionTitle, companyName, date }) => {
   const dispatch = useDispatch();
@@ -42,6 +42,18 @@ const JobBox: FC<TrackedJob> = ({ id, companyImage, positionTitle, companyName, 
             companyImage,
             board
           }));
+
+          switch (board) {
+            case BoardType.INTERVIEWS:
+              await storage.addTimelineLog({
+                positionTitle: positionTitle,
+                companyName: companyName,
+                date: new Date().toISOString(),
+                status: TrackedJobStatus.INTERVIEW,
+                title: `Interviu stabilit la ${companyName} pe data de .`
+              });
+              break;
+          }
         }
       }
     },
@@ -56,6 +68,13 @@ const JobBox: FC<TrackedJob> = ({ id, companyImage, positionTitle, companyName, 
     const removeTrackedJob = await storage.removeTrackedJob(id);
     if (removeTrackedJob) {
       dispatch(remove({ id: id }));
+      await storage.addTimelineLog({
+        positionTitle: positionTitle,
+        companyName: companyName,
+        date: new Date().toISOString(),
+        status: null,
+        title: `Ai șters jobul ${positionTitle}.`
+      });
     }
   }
 
