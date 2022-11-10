@@ -1,6 +1,7 @@
 import React, { FC } from 'react';
 
-import { useDrop } from 'react-dnd';
+import { useDroppable } from '@dnd-kit/core';
+import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
 
 import {
   EllipsisHorizontalIcon
@@ -10,17 +11,10 @@ import JobBox from '../../components/job-box/JobBox';
 import TrackedJob from '../../../interfaces/TrackedJob';
 import { BoardType } from '../../../interfaces/TrackedJobStatus';
 
-const Board: FC<{ type: BoardType; title: string; jobs: TrackedJob[] }> = ({ type, title, jobs = [] }) => {
-  const [{ canDrop, isOver }, drop] = useDrop(() => ({
-    accept: 'JOB_BOX',
-    drop: () => ({
-      board: type
-    }),
-    collect: (monitor) => ({
-      isOver: monitor.isOver(),
-      canDrop: monitor.canDrop(),
-    })
-  }));
+const Board: FC<{ type: BoardType; title: string; jobs: number[] }> = ({ type, title, jobs = [] }) => {
+  const { isOver, setNodeRef } = useDroppable({
+    id: type
+  });
 
   return (
     jobs &&
@@ -29,19 +23,26 @@ const Board: FC<{ type: BoardType; title: string; jobs: TrackedJob[] }> = ({ typ
         <h6 className='font-poppins font-medium text-sm'>{title} ({jobs.length})</h6>
         <EllipsisHorizontalIcon className='w-6 h-6 text-gray-400 cursor-pointer' />
       </div>
-      <div
-        ref={drop}
-        className={`${canDrop && isOver ? 'bg-gray-50' : 'bg-white'} rounded-xl w-full min-h-[200px]`}
+
+      <SortableContext
+        id={type} 
+        items={jobs} 
+        strategy={verticalListSortingStrategy}
       >
-        {
-          jobs.length > 0 ?
-            jobs.map((job, index)  => (
-              <JobBox key={index} {...job} />
-            ))
-          :
-            null
-        }
-      </div>
+        <div
+          ref={setNodeRef}
+          className={`${isOver ? 'bg-gray-50' : 'bg-white'} rounded-xl w-full min-h-[200px]`}
+        >
+          {
+            jobs.length > 0 ?
+              jobs.map((id, index) => (
+                <JobBox key={index} id={id} />
+              ))
+            :
+              null
+          }
+        </div>
+      </SortableContext>
     </div>
   );
 }
