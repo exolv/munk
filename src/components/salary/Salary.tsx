@@ -28,7 +28,7 @@ const Salary: FC<SalaryData> = ({ companyPositionRange, globalPositionRange }) =
         <div className='min-w-[200px] absolute top-9 -right-2 bg-white rounded-xl drop-shadow-munk z-50 hidden group-hover:!block'>
           <div className='w-4 h-4 transform rotate-45 absolute bg-white -top-1 right-[9px] -z-10'></div>
           <div className='px-6 py-5'>
-            <p className='font-poppins font-normal text-gray-500 text-[12px] text-left'>Estimare în baza cuvintelor cheie din titlul job-ului.</p>
+            <p className='font-poppins font-normal text-gray-500 text-[12px] text-left'>Estimare în baza cuvintelor cheie din titlul jobului.</p>
           </div>
           <div className='px-6 py-5 border-t border-solid border-gray-200'>
             <div className='flex items-center justify-between'>
