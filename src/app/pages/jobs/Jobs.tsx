@@ -99,7 +99,7 @@ const Jobs: FC = () => {
         const isBelowLastItem =
           over &&
           overIndex === overItems.length - 1 &&
-          draggingRect.offsetTop > over.rect.offsetTop + over.rect.height;
+          draggingRect?.offsetTop > over.rect?.offsetTop + over.rect.height;
 
         const modifier = isBelowLastItem ? 1 : 0;
 
