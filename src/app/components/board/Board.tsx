@@ -8,8 +8,8 @@ import {
 } from '@heroicons/react/24/outline';
 
 import JobBox from '../../components/job-box/JobBox';
-import TrackedJob from '../../../interfaces/TrackedJob';
 import { BoardType } from '../../../interfaces/TrackedJobStatus';
+import Sortable from '../dndkit/Sortable';
 
 const Board: FC<{ type: BoardType; title: string; jobs: number[] }> = ({ type, title, jobs = [] }) => {
   const { isOver, setNodeRef } = useDroppable({
@@ -29,14 +29,13 @@ const Board: FC<{ type: BoardType; title: string; jobs: number[] }> = ({ type, t
         items={jobs} 
         strategy={verticalListSortingStrategy}
       >
-        <div
-          ref={setNodeRef}
-          className={`${isOver ? 'bg-gray-50' : 'bg-white'} rounded-xl w-full min-h-[200px]`}
-        >
+        <div ref={setNodeRef} className={`bg-white rounded-xl w-full min-h-[200px]`}>
           {
             jobs.length > 0 ?
               jobs.map((id, index) => (
-                <JobBox key={index} id={id} />
+                <Sortable key={id} id={id}>
+                  <JobBox key={index} id={id} />
+                </Sortable>
               ))
             :
               null
