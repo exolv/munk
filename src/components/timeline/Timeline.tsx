@@ -8,14 +8,19 @@ import '../../styles.css';
 import { TrackedJobStatus } from '../../interfaces/TrackedJobStatus';
 import storage from '../../services/StorageService';
 import TimelineLog from '../../interfaces/TimelineLog';
+import TrackedJob from '../../interfaces/TrackedJob';
 
 const Timeline: FC = () => {
   const [timelineLogs, setTimelineLogs] = useState<TimelineLog[]>([]);
   useEffect(() => {
     (async () => {
-      const trackedJobs: any = await storage.getTimelineLogs();
-      if (trackedJobs) {
-        setTimelineLogs(trackedJobs);
+      let getTimelineLogs: any = await storage.getTimelineLogs();
+      if (getTimelineLogs) {
+        getTimelineLogs = Array.from(getTimelineLogs).sort((a: TrackedJob, b: TrackedJob) => {
+          return new Date(b.date).getTime() - new Date(a.date).getTime();
+        });
+        
+        setTimelineLogs(getTimelineLogs);
       }
     })();
   }, []);

@@ -7,29 +7,41 @@ import {
   KeyboardSensor,
   PointerSensor,
   useSensor,
-  useSensors
+  useSensors,
+  DragStartEvent,
+  DragOverEvent,
+  DragEndEvent
 } from '@dnd-kit/core';
 import { sortableKeyboardCoordinates, arrayMove } from '@dnd-kit/sortable';
 
 import { useSelector, useDispatch } from 'react-redux';
+import { update } from '../../redux/slices/trackedJobsSlice';
 
 import Navbar from '../../components/navbar/Navbar';
 import Sidebar from '../../components/sidebar/Sidebar';
 
 import Board from '../../components/board/Board';
-import { BoardType } from '../../../interfaces/TrackedJobStatus';
+import { BoardType, TrackedJobStatus } from '../../../interfaces/TrackedJobStatus';
 import TrackedJob from '../../../interfaces/TrackedJob';
 import { setInitialState } from '../../redux/slices/trackedJobsSlice';
 import JobBox from '../../components/job-box/JobBox';
+import storage from '../../../services/StorageService';
+
+interface TrackedJobsIds {
+  TRACKING: number[],
+  APPLIED: number[],
+  INTERVIEWS: number[],
+  OFFERS: number[]
+}
 
 const Jobs: FC = () => {
-  const [trackedJobs, setTrackedJobs] = useState({
+  const [trackedJobsIds, setTrackedJobsIds] = useState<TrackedJobsIds | any>({
     TRACKING: [],
     APPLIED: [],
     INTERVIEWS: [],
     OFFERS: []
   });
-  const [activeId, setActiveId] = useState();
+  const [activeTrackedJobId, setActiveTrackedJobId] = useState<number | null>();
 
   // Redux
   const dispatch = useDispatch<any>();
@@ -40,12 +52,13 @@ const Jobs: FC = () => {
   }, [dispatch]);
 
   useEffect(() => {
-    setTrackedJobs({
+    setTrackedJobsIds({
       TRACKING: initialTrackedJobs?.filter((job: TrackedJob) => job.board === BoardType.TRACKING).map((job: TrackedJob) => job.id),
       APPLIED: initialTrackedJobs?.filter((job: TrackedJob) => job.board === BoardType.APPLIED).map((job: TrackedJob) => job.id),
       INTERVIEWS: initialTrackedJobs?.filter((job: TrackedJob) => job.board === BoardType.INTERVIEWS).map((job: TrackedJob) => job.id),
       OFFERS: initialTrackedJobs?.filter((job: TrackedJob) => job.board === BoardType.OFFERS).map((job: TrackedJob) => job.id)
     });
+    
   }, [initialTrackedJobs]);
 
 
@@ -56,98 +69,113 @@ const Jobs: FC = () => {
       coordinateGetter: sortableKeyboardCoordinates
     })
   );
-  const findContainer = (id: any) => {
-    if (id in trackedJobs) {
+  const findContainer = (id: number): any => {
+    if (id in trackedJobsIds) {
       return id;
     }
 
-    return Object.keys(trackedJobs).find((board: BoardType) => trackedJobs[board].includes(id));
+    return Object.keys(trackedJobsIds).find((board: BoardType) => trackedJobsIds[board].includes(id));
   }
-  const handleDragStart = (event: any) => {
+  const handleDragStart = (event: DragStartEvent | any) => {
     const { active } = event;
     const { id } = active;
 
-    setActiveId(id);
+    setActiveTrackedJobId(id);
   }
-  const handleDragOver = (event: any) => {
+  const handleDragOver = (event: DragOverEvent | any) => {
     const { active, over, draggingRect } = event;
     const { id } = active;
     const { id: overId } = over;
 
-    const activeContainer: BoardType = findContainer(id);
-    const overContainer: BoardType = findContainer(overId);
+    const activeBoard = findContainer(id);
+    const overBoard = findContainer(overId);
 
-    if (
-      !activeContainer ||
-      !overContainer ||
-      activeContainer === overContainer
-    ) {
+    if (!activeBoard || !overBoard || activeBoard === overBoard) {
       return;
     }
 
-    setTrackedJobs((prev: any) => {
-      const activeItems = prev[activeContainer];
-      const overItems = prev[overContainer];
+    setTrackedJobsIds((prev: TrackedJobsIds | any) => {
+      const activeTrackedJobsIds = prev[activeBoard];
+      const overTrackedJobsIds = prev[overBoard];
 
-      const activeIndex = activeItems.indexOf(id);
-      const overIndex = overItems.indexOf(overId);
+      const activeIndex = activeTrackedJobsIds.indexOf(id);
+      const overIndex = overTrackedJobsIds.indexOf(overId);
 
       let newIndex;
       if (overId in prev) {
-        newIndex = overItems.length + 1;
+        newIndex = overTrackedJobsIds.length + 1;
       } else {
-        const isBelowLastItem =
-          over &&
-          overIndex === overItems.length - 1 &&
-          draggingRect?.offsetTop > over.rect?.offsetTop + over.rect.height;
-
+        const isBelowLastItem = over && overIndex === overTrackedJobsIds.length - 1 && draggingRect?.offsetTop > over.rect?.offsetTop + over.rect.height;
         const modifier = isBelowLastItem ? 1 : 0;
 
-        newIndex = overIndex >= 0 ? overIndex + modifier : overItems.length + 1;
+        newIndex = overIndex >= 0 ? overIndex + modifier : overTrackedJobsIds.length + 1;
       }
 
       return {
         ...prev,
-        [activeContainer]: [
-          ...prev[activeContainer].filter((item: any) => item !== active.id)
+        [activeBoard]: [
+          ...prev[activeBoard].filter((trackedJobsId: any) => trackedJobsId !== active.id)
         ],
-        [overContainer]: [
-          ...prev[overContainer].slice(0, newIndex),
-          trackedJobs[activeContainer][activeIndex],
-          ...prev[overContainer].slice(newIndex, prev[overContainer].length)
+        [overBoard]: [
+          ...prev[overBoard].slice(0, newIndex),
+          trackedJobsIds[activeBoard][activeIndex],
+          ...prev[overBoard].slice(newIndex, prev[overBoard].length)
         ]
       };
     });
   }
-  const handleDragEnd = (event: any) => {
+  const handleDragEnd = async (event: DragEndEvent | any) => {
     const { active, over } = event;
     const { id } = active;
     const { id: overId } = over;
 
-    const activeContainer: BoardType = findContainer(id);
-    const overContainer: BoardType = findContainer(overId);
+    const activeBoard = findContainer(id);
+    const overBoard = findContainer(overId);
 
-    if (
-      !activeContainer ||
-      !overContainer ||
-      activeContainer !== overContainer
-    ) {
+    if (!activeBoard || !overBoard || activeBoard !== overBoard) {
       return;
     }
 
-    const activeIndex = trackedJobs[activeContainer].indexOf(active.id);
-    const overIndex = trackedJobs[overContainer].indexOf(overId);
+    const activeIndex = trackedJobsIds[activeBoard].indexOf(active.id);
+    const overIndex = trackedJobsIds[overBoard].indexOf(overId);
 
     if (activeIndex !== overIndex) {
-      setTrackedJobs((items: any) => ({
-        ...items,
-        [overContainer]: arrayMove(items[overContainer], activeIndex, overIndex)
+      setTrackedJobsIds((trackedJobsIds: TrackedJobsIds | any) => ({
+        ...trackedJobsIds,
+        [overBoard]: arrayMove(trackedJobsIds[overBoard], activeIndex, overIndex)
       }));
+    } else {
+      const trackedJob: any = await storage.getTrackedJob(id);
+      if (trackedJob) {
+        const updateTrackedJob = await storage.updateTrackedJob(id, {
+          ...trackedJob,
+          board: overBoard as BoardType
+        });
+        if (updateTrackedJob) {
+          dispatch(update({
+            ...trackedJob,
+            board: overBoard as BoardType
+          }));
+
+          switch (overBoard as BoardType) {
+            case BoardType.INTERVIEWS:
+              await storage.addTimelineLog({
+                positionTitle: trackedJob.positionTitle,
+                companyName: trackedJob.companyName,
+                date: new Date().toISOString(),
+                status: TrackedJobStatus.INTERVIEW,
+                title: `Interviu stabilit la ${trackedJob.companyName} pe data de [DATE].`
+              });
+              break;
+          }
+        }
+      }
     }
 
-    setActiveId(null);
+    setActiveTrackedJobId(null);
   }
 
+  
   return (
     <div className='flex'>
       <Sidebar active='jobs' />
@@ -163,11 +191,11 @@ const Jobs: FC = () => {
         >
           <div className='pl-32 pr-20 py-24'>
             <div className='flex items-start'>
-              <Board type={BoardType.TRACKING} title='Joburi Salvate' jobs={trackedJobs.TRACKING} />
-              <Board type={BoardType.APPLIED} title='Aplicări' jobs={trackedJobs.APPLIED} />
-              <Board type={BoardType.INTERVIEWS} title='Interviuri' jobs={trackedJobs.INTERVIEWS} />
-              <Board type={BoardType.OFFERS} title='Oferte' jobs={trackedJobs.OFFERS} />
-              <DragOverlay>{activeId ? <JobBox id={activeId} active /> : null}</DragOverlay>
+              <Board type={BoardType.TRACKING} title='Joburi Salvate' jobs={trackedJobsIds.TRACKING} />
+              <Board type={BoardType.APPLIED} title='Aplicări' jobs={trackedJobsIds.APPLIED} />
+              <Board type={BoardType.INTERVIEWS} title='Interviuri' jobs={trackedJobsIds.INTERVIEWS} />
+              <Board type={BoardType.OFFERS} title='Oferte' jobs={trackedJobsIds.OFFERS} />
+              <DragOverlay>{activeTrackedJobId ? <JobBox id={activeTrackedJobId} /> : null}</DragOverlay>
             </div>
           </div>
           </DndContext>
