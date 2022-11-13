@@ -14,8 +14,8 @@ import {
 } from '@dnd-kit/core';
 import { sortableKeyboardCoordinates, arrayMove } from '@dnd-kit/sortable';
 
-import { useSelector, useDispatch } from 'react-redux';
-import { update } from '../../redux/slices/trackedJobsSlice';
+import storage from '../../../services/StorageService';
+import { useQuery, useMutation } from '@tanstack/react-query';
 
 import Navbar from '../../components/navbar/Navbar';
 import Sidebar from '../../components/sidebar/Sidebar';
@@ -23,9 +23,9 @@ import Sidebar from '../../components/sidebar/Sidebar';
 import Board from '../../components/board/Board';
 import { BoardType, TrackedJobStatus } from '../../../interfaces/TrackedJobStatus';
 import TrackedJob from '../../../interfaces/TrackedJob';
-import { setInitialState } from '../../redux/slices/trackedJobsSlice';
 import JobBox from '../../components/job-box/JobBox';
-import storage from '../../../services/StorageService';
+import { joinPaths } from '@remix-run/router';
+
 
 interface TrackedJobsIds {
   TRACKING: number[],
@@ -43,23 +43,25 @@ const Jobs: FC = () => {
   });
   const [activeTrackedJobId, setActiveTrackedJobId] = useState<number | null>();
 
-  // Redux
-  const dispatch = useDispatch<any>();
-  const initialTrackedJobs = useSelector((state: any) => state.trackedJobs.value);
+  // React Query
+  const { isLoading, error, data }: any = useQuery(['trackedJobs'], async () => await storage.getTrackedJobs());
+  const updateTrackedJobMutation = useMutation({
+    mutationFn: async (data: TrackedJob) => {
+      return await storage.updateTrackedJob(data.id, data);
+    }
+  });
   
   useEffect(() => {
-    dispatch(setInitialState());
-  }, [dispatch]);
-
-  useEffect(() => {
+    if (!data) {
+      return;
+    }
     setTrackedJobsIds({
-      TRACKING: initialTrackedJobs?.filter((job: TrackedJob) => job.board === BoardType.TRACKING).map((job: TrackedJob) => job.id),
-      APPLIED: initialTrackedJobs?.filter((job: TrackedJob) => job.board === BoardType.APPLIED).map((job: TrackedJob) => job.id),
-      INTERVIEWS: initialTrackedJobs?.filter((job: TrackedJob) => job.board === BoardType.INTERVIEWS).map((job: TrackedJob) => job.id),
-      OFFERS: initialTrackedJobs?.filter((job: TrackedJob) => job.board === BoardType.OFFERS).map((job: TrackedJob) => job.id)
+      TRACKING: data.filter((job: TrackedJob) => job.board === BoardType.TRACKING).map((job: TrackedJob) => job.id),
+      APPLIED: data.filter((job: TrackedJob) => job.board === BoardType.APPLIED).map((job: TrackedJob) => job.id),
+      INTERVIEWS: data.filter((job: TrackedJob) => job.board === BoardType.INTERVIEWS).map((job: TrackedJob) => job.id),
+      OFFERS: data.filter((job: TrackedJob) => job.board === BoardType.OFFERS).map((job: TrackedJob) => job.id)
     });
-    
-  }, [initialTrackedJobs]);
+  }, [data]);
 
 
   // Drag & Drop
@@ -152,10 +154,10 @@ const Jobs: FC = () => {
           board: overBoard as BoardType
         });
         if (updateTrackedJob) {
-          dispatch(update({
+          updateTrackedJobMutation.mutate({
             ...trackedJob,
-            board: overBoard as BoardType
-          }));
+            board: overBoard
+          });
 
           switch (overBoard as BoardType) {
             case BoardType.INTERVIEWS:
@@ -191,10 +193,10 @@ const Jobs: FC = () => {
         >
           <div className='pl-32 pr-20 py-24'>
             <div className='flex items-start'>
-              <Board type={BoardType.TRACKING} title='Joburi Salvate' jobs={trackedJobsIds.TRACKING} />
-              <Board type={BoardType.APPLIED} title='Aplicări' jobs={trackedJobsIds.APPLIED} />
-              <Board type={BoardType.INTERVIEWS} title='Interviuri' jobs={trackedJobsIds.INTERVIEWS} />
-              <Board type={BoardType.OFFERS} title='Oferte' jobs={trackedJobsIds.OFFERS} />
+              <Board type={BoardType.TRACKING} title='Joburi Salvate' jobs={trackedJobsIds?.TRACKING} />
+              <Board type={BoardType.APPLIED} title='Aplicări' jobs={trackedJobsIds?.APPLIED} />
+              <Board type={BoardType.INTERVIEWS} title='Interviuri' jobs={trackedJobsIds?.INTERVIEWS} />
+              <Board type={BoardType.OFFERS} title='Oferte' jobs={trackedJobsIds?.OFFERS} />
               <DragOverlay>{activeTrackedJobId ? <JobBox id={activeTrackedJobId} /> : null}</DragOverlay>
             </div>
           </div>

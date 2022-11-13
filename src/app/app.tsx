@@ -6,8 +6,10 @@ import {
   RouterProvider
 } from 'react-router-dom';
 
-import { store } from './redux/store';
-import { Provider } from 'react-redux';
+import {
+  QueryClient,
+  QueryClientProvider
+} from '@tanstack/react-query';
 
 import '../styles.css';
 
@@ -28,11 +30,13 @@ const router = createBrowserRouter([
   }
 ]);
 
+const queryClient = new QueryClient();
+
 const App: FC = () => {
   return (
-    <Provider store={store}>
+    <QueryClientProvider client={queryClient}>
       <RouterProvider router={router} />
-    </Provider>
+    </QueryClientProvider>
   );
 }
 
